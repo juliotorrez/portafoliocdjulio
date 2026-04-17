@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tarea 03 — Guía HTML5 | Cultura Digital 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --azul-pastel:    #b8d8f0;
+      --amarillo-pastel:#fce9a2;
+      --celeste-pastel: #c7eff8;
+      --blanco:         #ffffff;
+      --azul-medio:     #7ab8e0;
+      --azul-oscuro:    #3a7bbf;
+      --texto-oscuro:   #2c4a6e;
+      --sombra:         rgba(58,123,191,0.15);
+      --bg:             #edf6ff;
+      --code-bg:        #1a2b3c;
+      --code-bg2:       #162030;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body{ font-family:'Nunito',sans-serif; background:var(--bg); color:var(--texto-oscuro); overflow-x:hidden; }
+
+    /* ===== BACK BUTTON ===== */
+    .back-btn{
+      position:fixed; top:22px; left:22px; z-index:300;
+      display:flex; align-items:center; gap:8px;
+      background:var(--blanco); color:var(--azul-oscuro);
+      font-family:'Nunito',sans-serif; font-weight:700; font-size:.88rem;
+      padding:10px 20px 10px 14px; border-radius:30px;
+      box-shadow:0 4px 18px var(--sombra); text-decoration:none;
+      border:2px solid var(--azul-pastel); transition:all .25s;
+    }
+    .back-btn:hover{ background:var(--azul-oscuro); color:var(--blanco); border-color:var(--azul-oscuro); transform:translateX(-4px); }
+    .back-btn svg{ width:16px; height:16px; transition:transform .25s; }
+    .back-btn:hover svg{ transform:translateX(-3px); }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar{
+      position:fixed; top:0; left:0; height:3px; z-index:400;
+      background:linear-gradient(90deg, var(--azul-medio), var(--amarillo-pastel));
+      width:0%; transition:width .1s;
+      border-radius:0 3px 3px 0;
+    }
+
+    /* ===== HERO ===== */
+    .hero{
+      min-height:100vh;
+      background:linear-gradient(150deg, #e34c26 0%, #c0392b 30%, #2c4a6e 70%, #1a2b3c 100%);
+      position:relative; display:flex; align-items:center;
+      justify-content:center; overflow:hidden; padding:100px 30px 80px;
+    }
+
+    /* Etiquetas HTML flotando */
+    .floating-tags{ position:absolute; inset:0; pointer-events:none; }
+    .ftag{
+      position:absolute; font-family:'Fira Code',monospace;
+      color:rgba(255,255,255,0.09); font-weight:500;
+      animation:floatTag 9s ease-in-out infinite;
+    }
+    .ftag:nth-child(1){ font-size:2.8rem; top:6%;  left:4%;  animation-delay:0s; }
+    .ftag:nth-child(2){ font-size:1.6rem; top:15%; right:6%; animation-delay:1.5s; }
+    .ftag:nth-child(3){ font-size:2.2rem; top:35%; left:3%;  animation-delay:3s; }
+    .ftag:nth-child(4){ font-size:1.4rem; top:55%; right:5%; animation-delay:.8s; }
+    .ftag:nth-child(5){ font-size:1.8rem; top:72%; left:8%;  animation-delay:2s; }
+    .ftag:nth-child(6){ font-size:2rem;   top:82%; right:8%; animation-delay:4s; }
+    .ftag:nth-child(7){ font-size:1.2rem; top:25%; left:40%; animation-delay:1s; }
+    .ftag:nth-child(8){ font-size:1.5rem; top:65%; left:35%; animation-delay:2.5s; }
+    @keyframes floatTag{
+      0%,100%{ transform:translateY(0) rotate(-2deg); opacity:.09; }
+      50%    { transform:translateY(-18px) rotate(2deg); opacity:.16; }
+    }
+
+    /* Círculos decorativos */
+    .hero-orb{
+      position:absolute; border-radius:50%;
+      animation:orbFloat 8s ease-in-out infinite;
+    }
+    .hero-orb:nth-child(1){ width:350px;height:350px; background:radial-gradient(circle,rgba(227,76,38,.3),transparent 70%); top:-80px;right:-80px; animation-delay:0s; }
+    .hero-orb:nth-child(2){ width:200px;height:200px; background:radial-gradient(circle,rgba(122,184,224,.2),transparent 70%); bottom:10%;left:-60px; animation-delay:2s; }
+    .hero-orb:nth-child(3){ width:120px;height:120px; background:radial-gradient(circle,rgba(252,233,162,.2),transparent 70%); top:30%;right:20%; animation-delay:4s; }
+    @keyframes orbFloat{
+      0%,100%{ transform:scale(1) translateY(0); }
+      50%    { transform:scale(1.08) translateY(-12px); }
+    }
+
+    /* HTML Logo grande */
+    .html-logo-hero{
+      margin-bottom:20px;
+      animation:logoPulse 3s ease-in-out infinite;
+    }
+    @keyframes logoPulse{
+      0%,100%{ transform:scale(1) rotate(-2deg); filter:drop-shadow(0 8px 30px rgba(227,76,38,.5)); }
+      50%    { transform:scale(1.05) rotate(2deg); filter:drop-shadow(0 12px 40px rgba(227,76,38,.8)); }
+    }
+
+    .task-chip-hero{
+      position:absolute; top:28px; right:28px;
+      background:var(--amarillo-pastel); color:var(--texto-oscuro);
+      font-weight:800; font-size:.78rem; letter-spacing:1.5px;
+      padding:6px 16px; border-radius:20px; text-transform:uppercase;
+    }
+
+    .hero-inner{
+      position:relative; z-index:5;
+      display:flex; flex-direction:column;
+      align-items:center; text-align:center; gap:20px; max-width:780px;
+    }
+    .hero-tag{
+      background:rgba(255,255,255,.12); backdrop-filter:blur(8px);
+      color:var(--amarillo-pastel); font-size:.78rem; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:5px 18px; border-radius:20px;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .hero-title{
+      font-family:'Baloo 2',cursive; font-size:clamp(2.4rem,6vw,4.2rem);
+      font-weight:800; color:var(--blanco); line-height:1.08;
+      text-shadow:0 4px 30px rgba(0,0,0,.4);
+    }
+    .hero-title .accent{ color:#ff8c69; }
+    .hero-title .accent2{ color:var(--amarillo-pastel); }
+    .hero-sub{ font-size:1.05rem; color:rgba(255,255,255,.8); max-width:540px; line-height:1.7; }
+    .hero-stats{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+    .stat-pill{
+      background:rgba(255,255,255,.13); backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.2); color:var(--blanco);
+      font-size:.82rem; font-weight:700; padding:8px 18px; border-radius:20px;
+      display:flex; align-items:center; gap:7px;
+    }
+
+    /* Índice / nav interno */
+    .toc-nav{
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+      margin-top:10px;
+    }
+    .toc-link{
+      background:rgba(227,76,38,.25); backdrop-filter:blur(6px);
+      border:1px solid rgba(255,140,105,.4); color:#ff8c69;
+      font-size:.78rem; font-weight:700; padding:6px 14px; border-radius:20px;
+      text-decoration:none; transition:all .2s;
+    }
+    .toc-link:hover{ background:rgba(227,76,38,.5); color:var(--blanco); }
+
+    .wave-hero{ position:absolute; bottom:0; left:0; width:100%; line-height:0; }
+
+    /* ===== CONTENIDO ===== */
+    .content{ max-width:980px; margin:0 auto; padding:60px 28px 80px; }
+
+    /* Sección */
+    .guide-section{
+      margin-bottom:64px;
+      animation:fadeUp .5s ease both;
+    }
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(24px); }
+      to  { opacity:1; transform:translateY(0); }
+    }
+
+    /* Anchor heading */
+    .sec-anchor{ scroll-margin-top:80px; }
+
+    /* Header de sección */
+    .sec-head{
+      display:flex; align-items:center; gap:14px; margin-bottom:22px;
+    }
+    .sec-num{
+      width:50px; height:50px; border-radius:14px; flex-shrink:0;
+      background:linear-gradient(135deg,#e34c26,#c0392b);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Baloo 2',cursive; font-size:1.3rem; font-weight:800;
+      color:var(--blanco); box-shadow:0 4px 16px rgba(227,76,38,.35);
+    }
+    .sec-num.blue { background:linear-gradient(135deg,var(--azul-oscuro),var(--azul-medio)); box-shadow:0 4px 16px var(--sombra); }
+    .sec-num.yellow{ background:linear-gradient(135deg,#e6b800,#fce9a2); color:var(--texto-oscuro); box-shadow:0 4px 16px rgba(230,184,0,.3); }
+    .sec-num.teal { background:linear-gradient(135deg,#0abde3,var(--azul-medio)); box-shadow:0 4px 16px rgba(10,189,227,.3); }
+    .sec-num.green { background:linear-gradient(135deg,#10ac84,#1dd1a1); box-shadow:0 4px 16px rgba(16,172,132,.3); }
+    .sec-num.purple{ background:linear-gradient(135deg,#8854d0,#a55eea); box-shadow:0 4px 16px rgba(136,84,208,.3); }
+
+    .sec-titles .sec-title{ font-family:'Baloo 2',cursive; font-size:1.6rem; font-weight:800; color:var(--texto-oscuro); line-height:1.2; }
+    .sec-titles .sec-sub  { font-size:.88rem; color:var(--azul-medio); font-weight:600; margin-top:2px; }
+
+    /* Caja de texto */
+    .prose{
+      font-size:.97rem; line-height:1.82; color:#476a8a;
+      background:var(--blanco); border-radius:18px;
+      padding:24px 28px; box-shadow:0 4px 20px var(--sombra);
+      margin-bottom:20px;
+    }
+    .prose p{ margin-bottom:12px; }
+    .prose p:last-child{ margin-bottom:0; }
+    .prose strong{ color:var(--texto-oscuro); }
+
+    /* Info box coloreada */
+    .info-box{
+      border-radius:18px; padding:20px 24px; margin-bottom:20px;
+      display:flex; gap:14px; align-items:flex-start;
+    }
+    .info-box.tip   { background:#e8f7f0; border-left:5px solid #10ac84; }
+    .info-box.warn  { background:#fff8e1; border-left:5px solid #e6b800; }
+    .info-box.note  { background:#e8f2fb; border-left:5px solid var(--azul-medio); }
+    .info-box-icon  { font-size:1.4rem; flex-shrink:0; margin-top:2px; }
+    .info-box-text  { font-size:.92rem; line-height:1.7; color:#476a8a; }
+    .info-box-text strong{ color:var(--texto-oscuro); }
+
+    /* Bloque de código */
+    .code-wrap{ margin-bottom:20px; }
+    .code-header{
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--code-bg2); padding:10px 18px;
+      border-radius:14px 14px 0 0;
+    }
+    .code-dots{ display:flex; gap:6px; }
+    .cd{ width:11px; height:11px; border-radius:50%; }
+    .cd.r{ background:#ff5f57; } .cd.y{ background:#febc2e; } .cd.g{ background:#28c840; }
+    .code-label{
+      font-family:'Fira Code',monospace; font-size:.72rem;
+      color:rgba(255,255,255,.4); letter-spacing:.5px;
+    }
+    .code-tag{
+      background:rgba(227,76,38,.3); color:#ff8c69;
+      font-size:.68rem; font-weight:700; padding:2px 10px;
+      border-radius:10px; letter-spacing:.5px;
+    }
+    pre{
+      background:var(--code-bg); padding:18px 22px; overflow-x:auto;
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      line-height:1.75; color:#cdd9e5;
+      border-radius:0 0 14px 14px;
+      margin-bottom:0;
+    }
+    .code-wrap + .code-wrap{ margin-top:0; }
+
+    /* Sintaxis highlight */
+    .kw  { color:#79b8ff; font-weight:500; }
+    .tag { color:#85e89d; }
+    .atr { color:#ffab70; }
+    .val { color:#9ecbff; }
+    .cm  { color:#6a737d; font-style:italic; }
+    .str { color:#9ecbff; }
+    .num { color:#f8c555; }
+    .sel { color:#85e89d; }
+    .prop{ color:#79b8ff; }
+    .pun { color:#cdd9e5; }
+    .txt { color:#e1e7ed; }
+    .ent { color:#ff8c69; }
+
+    /* Tabla de etiquetas */
+    .tag-table-wrap{
+      background:var(--blanco); border-radius:18px;
+      overflow:hidden; box-shadow:0 4px 20px var(--sombra);
+      margin-bottom:20px; overflow-x:auto;
+    }
+    table{ width:100%; border-collapse:collapse; }
+    thead th{
+      background:linear-gradient(135deg,var(--azul-oscuro),var(--azul-medio));
+      color:var(--blanco); font-family:'Baloo 2',cursive; font-size:.9rem;
+      font-weight:700; padding:14px 18px; text-align:left;
+    }
+    tbody tr:nth-child(even){ background:#f4f9ff; }
+    tbody tr:hover{ background:var(--celeste-pastel); transition:background .2s; }
+    tbody td{ padding:11px 18px; font-size:.87rem; color:#476a8a; vertical-align:middle; border-bottom:1px solid #e8f2fb; }
+    tbody td:first-child{
+      font-family:'Fira Code',monospace; font-size:.82rem;
+      color:#e34c26; font-weight:600; white-space:nowrap;
+    }
+    tbody td .badge{
+      display:inline-block; font-size:.68rem; font-weight:700;
+      padding:2px 8px; border-radius:10px; text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .badge.block{ background:#e8f2fb; color:var(--azul-oscuro); }
+    .badge.inline{ background:#e8f7f0; color:#10ac84; }
+    .badge.media{ background:#fff3cd; color:#856404; }
+    .badge.form { background:#f3e8ff; color:#6f42c1; }
+    .badge.meta { background:#fdecea; color:#c0392b; }
+
+    /* Cards de atributos */
+    .attr-grid{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px; margin-bottom:20px;
+    }
+    .attr-card{
+      background:var(--blanco); border-radius:16px; padding:18px 20px;
+      box-shadow:0 4px 16px var(--sombra); border-top:4px solid;
+      transition:transform .25s, box-shadow .25s;
+    }
+    .attr-card:hover{ transform:translateY(-5px); box-shadow:0 10px 28px var(--sombra); }
+    .attr-card:nth-child(1){ border-color:#e34c26; }
+    .attr-card:nth-child(2){ border-color:var(--azul-medio); }
+    .attr-card:nth-child(3){ border-color:#10ac84; }
+    .attr-card:nth-child(4){ border-color:#e6b800; }
+    .attr-card:nth-child(5){ border-color:#a55eea; }
+    .attr-card:nth-child(6){ border-color:#0abde3; }
+    .attr-icon { font-size:1.6rem; margin-bottom:8px; }
+    .attr-name {
+      font-family:'Fira Code',monospace; font-size:.88rem;
+      font-weight:600; color:var(--texto-oscuro); margin-bottom:4px;
+    }
+    .attr-desc { font-size:.83rem; color:#6a90b5; line-height:1.55; }
+
+    /* Divisor */
+    .divider{
+      height:3px; margin:10px 0 54px;
+      background:linear-gradient(90deg,transparent,var(--azul-pastel),var(--amarillo-pastel),transparent);
+      border-radius:4px;
+    }
+
+    /* Resultado visual demo */
+    .demo-box{
+      background:var(--blanco); border-radius:0 0 14px 14px;
+      border:2px dashed var(--azul-pastel); border-top:none;
+      padding:20px 24px; margin-bottom:20px;
+      font-size:.9rem; line-height:1.7;
+    }
+    .demo-label{
+      background:var(--azul-pastel); color:var(--texto-oscuro);
+      font-size:.7rem; font-weight:700; letter-spacing:1px;
+      text-transform:uppercase; padding:4px 14px;
+      border-radius:14px 14px 0 0; display:inline-block;
+      margin-bottom:-2px;
+    }
+
+    /* Estructura visual del documento HTML */
+    .doc-tree{
+      background:var(--blanco); border-radius:18px; padding:26px 28px;
+      box-shadow:0 4px 20px var(--sombra); margin-bottom:20px;
+      font-family:'Fira Code',monospace; font-size:.85rem;
+    }
+    .tree-line{ display:flex; align-items:center; gap:8px; padding:3px 0; }
+    .tree-line .indent{ width:24px; border-left:2px dashed var(--azul-pastel); margin-left:12px; flex-shrink:0; }
+    .tree-tag-o{ color:#e34c26; font-weight:600; }
+    .tree-tag-c{ color:#c0392b; }
+    .tree-attr { color:#ffab70; }
+    .tree-text { color:#6a9dc8; font-style:italic; font-family:'Nunito',sans-serif; font-size:.82rem; }
+    .tree-cm   { color:#6a737d; font-style:italic; }
+
+    /* Conclusión */
+    .conclusion{
+      background:linear-gradient(135deg,var(--texto-oscuro),var(--azul-oscuro));
+      border-radius:22px; padding:36px 38px;
+      color:var(--blanco); position:relative; overflow:hidden;
+    }
+    .conclusion::before{ content:'🦦'; position:absolute; right:24px; bottom:16px; font-size:4.5rem; opacity:.1; }
+    .conclusion::after { content:'</html>'; position:absolute; left:28px; top:16px; font-family:'Fira Code',monospace; font-size:.9rem; color:rgba(255,255,255,.08); }
+    .conclusion h3{ font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:var(--amarillo-pastel); margin-bottom:14px; }
+    .conclusion p{ font-size:.97rem; line-height:1.8; color:rgba(255,255,255,.85); margin-bottom:10px; }
+    .conclusion p:last-child{ margin-bottom:0; }
+
+    /* Footer */
+    .task-footer{ background:var(--texto-oscuro); color:rgba(255,255,255,.45); text-align:center; padding:24px 20px; font-size:.82rem; }
+    .task-footer span{ color:var(--amarillo-pastel); font-weight:700; }
+
+    /* Responsive */
+    @media(max-width:600px){
+      .hero-stats{ gap:10px; }
+      .stat-pill{ font-size:.75rem; padding:6px 12px; }
+      .content{ padding:40px 18px 60px; }
+      table { font-size:.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Back -->
+<a class="back-btn" href="index.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  Regresar al portafolio
+</a>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+
+  <div class="floating-tags">
+    <span class="ftag">&lt;html&gt;</span>
+    <span class="ftag">&lt;/body&gt;</span>
+    <span class="ftag">&lt;div&gt;</span>
+    <span class="ftag">&lt;h1&gt;</span>
+    <span class="ftag">&lt;section&gt;</span>
+    <span class="ftag">&lt;/html&gt;</span>
+    <span class="ftag">&lt;p&gt;</span>
+    <span class="ftag">&lt;img/&gt;</span>
+  </div>
+
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+
+  <div class="task-chip-hero">✦ Tarea 03</div>
+
+  <div class="hero-inner">
+
+    <!-- HTML Logo SVG -->
+    <div class="html-logo-hero">
+      <svg width="110" height="110" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#E44D26" d="M19.037 113.876L9.032 1.601h109.936l-10.016 112.258-45.019 12.58z"/>
+        <path fill="#F16529" d="M64 116.8l36.378-10.086 8.559-95.878H64z"/>
+        <path fill="#EBEBEB" d="M64 52.455H45.788l-1.258-14.117H64V24.8H29.01l.33 3.692 3.382 37.963H64zm0 35.743l-.061.017-15.327-4.14-.979-10.975H33.816l1.928 21.609 28.193 7.826.063-.017z"/>
+        <path fill="#fff" d="M63.952 52.455v13.438h16.947l-1.597 17.854-15.35 4.143v13.962l28.215-7.82.207-2.325 3.234-36.233.336-3.72H63.952zm0-27.655v13.538h33.244l.277-3.108.63-6.978.329-3.452z"/>
+      </svg>
+    </div>
+
+    <div class="hero-tag">💻 Cultura Digital 2 · Programación con IA</div>
+    <h1 class="hero-title">
+      Guía Completa de<br>
+      <span class="accent">HTML</span><span class="accent2">5</span><br>
+      <span style="font-size:.55em;color:rgba(255,255,255,.7);font-weight:600;">De cero a dominar el lenguaje de la web</span>
+    </h1>
+    <p class="hero-sub">Aprende todas las etiquetas, atributos, conceptos y buenas prácticas de HTML5 desde los fundamentos hasta elementos semánticos avanzados.</p>
+
+    <div class="hero-stats">
+      <span class="stat-pill">📚 8 módulos</span>
+      <span class="stat-pill">🏷️ +60 etiquetas</span>
+      <span class="stat-pill">💡 Ejemplos de código</span>
+      <span class="stat-pill">🎯 Nivel: Desde cero</span>
+    </div>
+
+    <nav class="toc-nav">
+      <a class="toc-link" href="#modulo1">1. ¿Qué es HTML?</a>
+      <a class="toc-link" href="#modulo2">2. Estructura</a>
+      <a class="toc-link" href="#modulo3">3. Texto</a>
+      <a class="toc-link" href="#modulo4">4. Listas y tablas</a>
+      <a class="toc-link" href="#modulo5">5. Multimedia</a>
+      <a class="toc-link" href="#modulo6">6. Formularios</a>
+      <a class="toc-link" href="#modulo7">7. Semántica</a>
+      <a class="toc-link" href="#modulo8">8. Atributos</a>
+    </nav>
+  </div>
+
+  <div class="wave-hero">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#edf6ff" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,30 1440,40 L1440,80 L0,80 Z"/>
+    </svg>
+  </div>
+</header>
+
+<!-- ===== CONTENIDO ===== -->
+<main class="content">
+
+  <!-- =================== MÓDULO 1 =================== -->
+  <section class="guide-section sec-anchor" id="modulo1">
+    <div class="sec-head">
+      <div class="sec-num">01</div>
+      <div class="sec-titles">
+        <div class="sec-title">¿Qué es HTML5?</div>
+        <div class="sec-sub">Fundamentos y origen del lenguaje de la web</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p><strong>HTML (HyperText Markup Language)</strong> es el lenguaje de marcado estándar para crear páginas web. No es un lenguaje de programación como tal: es un sistema de etiquetas que le dice al navegador <em>qué es</em> cada elemento de una página (un título, un párrafo, una imagen, un botón...).</p>
+      <p>La versión <strong>HTML5</strong>, publicada oficialmente en 2014 por el W3C, es la versión actual y trae mejoras enormes: soporte nativo para video y audio, etiquetas semánticas, Canvas para gráficos, APIs de geolocalización, almacenamiento local y mucho más.</p>
+      <p>Fue inventado por <strong>Tim Berners-Lee</strong> en 1991 (¡el mismo que conocimos en la Tarea 01!). Desde entonces, HTML ha evolucionado hasta convertirse en el pilar de toda la web moderna.</p>
+    </div>
+
+    <div class="info-box tip">
+      <span class="info-box-icon">💡</span>
+      <div class="info-box-text"><strong>¿Cómo funciona?</strong> Tú escribes el código HTML, el navegador (Chrome, Firefox, Safari...) lo lee y lo convierte en la página visual que ves. El navegador es el intérprete de HTML.</div>
+    </div>
+
+    <div class="info-box note">
+      <span class="info-box-icon">🌐</span>
+      <div class="info-box-text"><strong>Tecnologías hermanas:</strong> HTML define la <em>estructura</em>, CSS define el <em>estilo visual</em>, y JavaScript define el <em>comportamiento interactivo</em>. Los tres juntos forman el desarrollo web front-end.</div>
+    </div>
+
+    <!-- Árbol visual del documento -->
+    <div class="prose" style="margin-bottom:10px;"><p><strong>¿Cómo luce internamente un documento HTML?</strong> Todo documento tiene una jerarquía de elementos anidados, como un árbol:</p></div>
+    <div class="doc-tree">
+      <div class="tree-line"><span class="tree-tag-o">&lt;!DOCTYPE html&gt;</span> <span class="tree-cm">← declara que es HTML5</span></div>
+      <div class="tree-line"><span class="tree-tag-o">&lt;html lang="es"&gt;</span> <span class="tree-cm">← elemento raíz</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="tree-tag-o">&lt;head&gt;</span> <span class="tree-cm">← metadatos (invisible)</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="indent"></span><span class="tree-tag-o">&lt;meta charset="UTF-8"&gt;</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="indent"></span><span class="tree-tag-o">&lt;title&gt;</span><span class="tree-text">Mi página web</span><span class="tree-tag-c">&lt;/title&gt;</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="tree-tag-c">&lt;/head&gt;</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="tree-tag-o">&lt;body&gt;</span> <span class="tree-cm">← contenido visible</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="indent"></span><span class="tree-tag-o">&lt;h1&gt;</span><span class="tree-text">Título principal</span><span class="tree-tag-c">&lt;/h1&gt;</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="indent"></span><span class="tree-tag-o">&lt;p&gt;</span><span class="tree-text">Un párrafo de texto</span><span class="tree-tag-c">&lt;/p&gt;</span></div>
+      <div class="tree-line"><span class="indent"></span><span class="tree-tag-c">&lt;/body&gt;</span></div>
+      <div class="tree-line"><span class="tree-tag-c">&lt;/html&gt;</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 2 =================== -->
+  <section class="guide-section sec-anchor" id="modulo2">
+    <div class="sec-head">
+      <div class="sec-num blue">02</div>
+      <div class="sec-titles">
+        <div class="sec-title">Estructura Básica</div>
+        <div class="sec-sub">Etiquetas fundamentales de todo documento HTML</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">mi-primera-pagina.html</span>
+        <span class="code-tag">ESTRUCTURA</span>
+      </div>
+      <pre><span class="cm">&lt;!-- 1. Declaración DOCTYPE (siempre va al inicio) --&gt;</span>
+<span class="kw">&lt;!DOCTYPE</span> <span class="atr">html</span><span class="kw">&gt;</span>
+
+<span class="cm">&lt;!-- 2. Elemento raíz con idioma --&gt;</span>
+<span class="tag">&lt;html</span> <span class="atr">lang</span>=<span class="val">"es"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- 3. Cabecera (metadatos, no visible) --&gt;</span>
+  <span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="atr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="atr">name</span>=<span class="val">"viewport"</span> <span class="atr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="atr">name</span>=<span class="val">"description"</span> <span class="atr">content</span>=<span class="val">"Mi primera página web"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span><span class="txt">Mi Primera Página</span><span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;link</span> <span class="atr">rel</span>=<span class="val">"stylesheet"</span> <span class="atr">href</span>=<span class="val">"estilos.css"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;/head&gt;</span>
+
+  <span class="cm">&lt;!-- 4. Cuerpo (todo lo visible) --&gt;</span>
+  <span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span><span class="txt">¡Hola desde HTML5!</span><span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="txt">Esta es mi primera página web.</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;script</span> <span class="atr">src</span>=<span class="val">"app.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;/body&gt;</span>
+
+<span class="tag">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="tag-table-wrap">
+      <table>
+        <thead>
+          <tr><th>Etiqueta</th><th>Función</th><th>Tipo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>&lt;!DOCTYPE html&gt;</td><td>Declara la versión de HTML (HTML5). Va siempre en la primera línea.</td><td><span class="badge meta">meta</span></td></tr>
+          <tr><td>&lt;html&gt;</td><td>Elemento raíz que envuelve todo el documento.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;head&gt;</td><td>Contiene metadatos: título, charset, enlaces a CSS, scripts, SEO.</td><td><span class="badge meta">meta</span></td></tr>
+          <tr><td>&lt;meta&gt;</td><td>Define metadatos como charset (codificación), viewport (responsive), descripción.</td><td><span class="badge meta">meta</span></td></tr>
+          <tr><td>&lt;title&gt;</td><td>Define el título que aparece en la pestaña del navegador.</td><td><span class="badge meta">meta</span></td></tr>
+          <tr><td>&lt;link&gt;</td><td>Vincula recursos externos como hojas de estilo CSS.</td><td><span class="badge meta">meta</span></td></tr>
+          <tr><td>&lt;body&gt;</td><td>Contiene todo el contenido visible de la página.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;script&gt;</td><td>Incluye o vincula código JavaScript.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;style&gt;</td><td>Escribe CSS directamente dentro del HTML (no recomendado para proyectos grandes).</td><td><span class="badge meta">meta</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box warn">
+      <span class="info-box-icon">⚠️</span>
+      <div class="info-box-text"><strong>Regla importante:</strong> Las etiquetas HTML se abren <code>&lt;etiqueta&gt;</code> y se cierran <code>&lt;/etiqueta&gt;</code>. Algunas etiquetas son "auto-cerradas" y no necesitan etiqueta de cierre: <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code>, <code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 3 =================== -->
+  <section class="guide-section sec-anchor" id="modulo3">
+    <div class="sec-head">
+      <div class="sec-num yellow">03</div>
+      <div class="sec-titles">
+        <div class="sec-title">Etiquetas de Texto</div>
+        <div class="sec-sub">Encabezados, párrafos, énfasis y formato</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">texto.html</span>
+        <span class="code-tag">TEXTO</span>
+      </div>
+      <pre><span class="cm">&lt;!-- Encabezados: del más importante (h1) al menos (h6) --&gt;</span>
+<span class="tag">&lt;h1&gt;</span><span class="txt">Título Principal (solo 1 por página)</span><span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;h2&gt;</span><span class="txt">Subtítulo de sección</span><span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;h3&gt;</span><span class="txt">Sub-sección</span><span class="tag">&lt;/h3&gt;</span>
+<span class="tag">&lt;h4&gt;</span><span class="txt">Nivel 4</span><span class="tag">&lt;/h4&gt;</span>
+
+<span class="cm">&lt;!-- Párrafo --&gt;</span>
+<span class="tag">&lt;p&gt;</span><span class="txt">Esto es un párrafo de texto normal.</span><span class="tag">&lt;/p&gt;</span>
+
+<span class="cm">&lt;!-- Énfasis y formato --&gt;</span>
+<span class="tag">&lt;p&gt;</span>
+  Texto <span class="tag">&lt;strong&gt;</span><span class="txt">muy importante</span><span class="tag">&lt;/strong&gt;</span> (negrita semántica).
+  Texto <span class="tag">&lt;em&gt;</span><span class="txt">con énfasis</span><span class="tag">&lt;/em&gt;</span> (cursiva semántica).
+  Texto <span class="tag">&lt;mark&gt;</span><span class="txt">resaltado</span><span class="tag">&lt;/mark&gt;</span> en amarillo.
+  Texto <span class="tag">&lt;del&gt;</span><span class="txt">tachado</span><span class="tag">&lt;/del&gt;</span> y <span class="tag">&lt;ins&gt;</span><span class="txt">insertado</span><span class="tag">&lt;/ins&gt;</span>.
+  Fórmula: H<span class="tag">&lt;sub&gt;</span><span class="txt">2</span><span class="tag">&lt;/sub&gt;</span>O y E=mc<span class="tag">&lt;sup&gt;</span><span class="txt">2</span><span class="tag">&lt;/sup&gt;</span>.
+<span class="tag">&lt;/p&gt;</span>
+
+<span class="cm">&lt;!-- Salto de línea y línea horizontal --&gt;</span>
+<span class="tag">&lt;br&gt;</span>  <span class="cm">&lt;!-- salto de línea, NO usa cierre --&gt;</span>
+<span class="tag">&lt;hr&gt;</span>  <span class="cm">&lt;!-- línea horizontal divisoria --&gt;</span>
+
+<span class="cm">&lt;!-- Citas --&gt;</span>
+<span class="tag">&lt;blockquote&gt;</span>
+  <span class="txt">La Web es para todos. — Tim Berners-Lee</span>
+<span class="tag">&lt;/blockquote&gt;</span>
+
+<span class="cm">&lt;!-- Código y preformateado --&gt;</span>
+<span class="tag">&lt;code&gt;</span><span class="txt">console.log("Hola")</span><span class="tag">&lt;/code&gt;</span>
+<span class="tag">&lt;pre&gt;</span><span class="txt">Texto
+  con espacios
+    respetados</span><span class="tag">&lt;/pre&gt;</span>
+
+<span class="cm">&lt;!-- Dirección y tiempo --&gt;</span>
+<span class="tag">&lt;address&gt;</span><span class="txt">Tuxtla Gutiérrez, Chiapas</span><span class="tag">&lt;/address&gt;</span>
+<span class="tag">&lt;time</span> <span class="atr">datetime</span>=<span class="val">"2025-01-15"</span><span class="tag">&gt;</span><span class="txt">15 de enero de 2025</span><span class="tag">&lt;/time&gt;</span></pre>
+    </div>
+
+    <div class="tag-table-wrap">
+      <table>
+        <thead><tr><th>Etiqueta</th><th>Descripción</th><th>Tipo</th></tr></thead>
+        <tbody>
+          <tr><td>&lt;h1&gt; … &lt;h6&gt;</td><td>Encabezados. h1 es el más importante (usado para el título principal de la página).</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;p&gt;</td><td>Párrafo de texto. El navegador agrega margen arriba y abajo automáticamente.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;strong&gt;</td><td>Texto importante/negrita con valor semántico (SEO lo considera relevante).</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;em&gt;</td><td>Texto con énfasis/cursiva semántica.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;mark&gt;</td><td>Texto resaltado (como con marcador).</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;del&gt; / &lt;ins&gt;</td><td>Texto eliminado / insertado (tachado o subrayado).</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;sub&gt; / &lt;sup&gt;</td><td>Subíndice (H₂O) y superíndice (m²).</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;br&gt;</td><td>Salto de línea. Es auto-cerrada, no tiene contenido.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;hr&gt;</td><td>Línea horizontal divisoria temática.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;blockquote&gt;</td><td>Cita larga de otra fuente. Se muestra con sangría.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;q&gt;</td><td>Cita breve en línea. El navegador agrega comillas automáticas.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;code&gt;</td><td>Fragmento de código en línea (fuente monoespaciada).</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;pre&gt;</td><td>Texto preformateado: respeta espacios y saltos de línea tal cual.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;span&gt;</td><td>Contenedor inline genérico para aplicar estilos o JS a parte de un texto.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;div&gt;</td><td>Contenedor block genérico para agrupar elementos y aplicar CSS.</td><td><span class="badge block">block</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 4 =================== -->
+  <section class="guide-section sec-anchor" id="modulo4">
+    <div class="sec-head">
+      <div class="sec-num teal">04</div>
+      <div class="sec-titles">
+        <div class="sec-title">Listas y Tablas</div>
+        <div class="sec-sub">Organización de información estructurada</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">listas.html</span>
+        <span class="code-tag">LISTAS</span>
+      </div>
+      <pre><span class="cm">&lt;!-- Lista desordenada (viñetas) --&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">HTML</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">CSS</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">JavaScript</span><span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+
+<span class="cm">&lt;!-- Lista ordenada (numerada) --&gt;</span>
+<span class="tag">&lt;ol&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">Aprender HTML5</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">Aprender CSS3</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="txt">Aprender JavaScript</span><span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ol&gt;</span>
+
+<span class="cm">&lt;!-- Lista de definición --&gt;</span>
+<span class="tag">&lt;dl&gt;</span>
+  <span class="tag">&lt;dt&gt;</span><span class="txt">HTML</span><span class="tag">&lt;/dt&gt;</span>
+  <span class="tag">&lt;dd&gt;</span><span class="txt">Lenguaje de marcado para la web</span><span class="tag">&lt;/dd&gt;</span>
+  <span class="tag">&lt;dt&gt;</span><span class="txt">CSS</span><span class="tag">&lt;/dt&gt;</span>
+  <span class="tag">&lt;dd&gt;</span><span class="txt">Hojas de estilo en cascada</span><span class="tag">&lt;/dd&gt;</span>
+<span class="tag">&lt;/dl&gt;</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">tabla.html</span>
+        <span class="code-tag">TABLAS</span>
+      </div>
+      <pre><span class="tag">&lt;table&gt;</span>
+  <span class="cm">&lt;!-- Cabecera de la tabla --&gt;</span>
+  <span class="tag">&lt;thead&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>  <span class="cm">&lt;!-- tr = table row (fila) --&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="txt">Lenguaje</span><span class="tag">&lt;/th&gt;</span>  <span class="cm">&lt;!-- th = table header --&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="txt">Uso</span><span class="tag">&lt;/th&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="txt">Dificultad</span><span class="tag">&lt;/th&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/thead&gt;</span>
+  <span class="cm">&lt;!-- Cuerpo de la tabla --&gt;</span>
+  <span class="tag">&lt;tbody&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="txt">HTML</span><span class="tag">&lt;/td&gt;</span>  <span class="cm">&lt;!-- td = table data (celda) --&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="txt">Estructura web</span><span class="tag">&lt;/td&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="txt">Fácil</span><span class="tag">&lt;/td&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;td</span> <span class="atr">colspan</span>=<span class="val">"2"</span><span class="tag">&gt;</span><span class="txt">Celda que ocupa 2 columnas</span><span class="tag">&lt;/td&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="txt">Media</span><span class="tag">&lt;/td&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/tbody&gt;</span>
+  <span class="tag">&lt;tfoot&gt;</span>
+    <span class="tag">&lt;tr&gt;</span><span class="tag">&lt;td</span> <span class="atr">colspan</span>=<span class="val">"3"</span><span class="tag">&gt;</span><span class="txt">Pie de tabla</span><span class="tag">&lt;/td&gt;</span><span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/tfoot&gt;</span>
+<span class="tag">&lt;/table&gt;</span></pre>
+    </div>
+
+    <div class="info-box tip">
+      <span class="info-box-icon">💡</span>
+      <div class="info-box-text"><strong>colspan y rowspan:</strong> <code>colspan="n"</code> hace que una celda ocupe n columnas. <code>rowspan="n"</code> hace que ocupe n filas. Son muy útiles para tablas complejas.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 5 =================== -->
+  <section class="guide-section sec-anchor" id="modulo5">
+    <div class="sec-head">
+      <div class="sec-num green">05</div>
+      <div class="sec-titles">
+        <div class="sec-title">Multimedia y Enlaces</div>
+        <div class="sec-sub">Imágenes, video, audio y navegación entre páginas</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">multimedia.html</span>
+        <span class="code-tag">MEDIA</span>
+      </div>
+      <pre><span class="cm">&lt;!-- ===== ENLACES ===== --&gt;</span>
+<span class="cm">&lt;!-- Enlace externo (abre en nueva pestaña) --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"https://www.google.com"</span> <span class="atr">target</span>=<span class="val">"_blank"</span> <span class="atr">rel</span>=<span class="val">"noopener"</span><span class="tag">&gt;</span>
+  <span class="txt">Ir a Google</span>
+<span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace interno (dentro del sitio) --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"tarea-01.html"</span><span class="tag">&gt;</span><span class="txt">Ver Tarea 01</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Ancla interna (ir a sección de la misma página) --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"#modulo3"</span><span class="tag">&gt;</span><span class="txt">Ir al módulo 3</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace de correo y teléfono --&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"mailto:correo@ejemplo.com"</span><span class="tag">&gt;</span><span class="txt">Enviar correo</span><span class="tag">&lt;/a&gt;</span>
+<span class="tag">&lt;a</span> <span class="atr">href</span>=<span class="val">"tel:+529611234567"</span><span class="tag">&gt;</span><span class="txt">Llamar</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- ===== IMÁGENES ===== --&gt;</span>
+<span class="tag">&lt;img</span>
+  <span class="atr">src</span>=<span class="val">"foto.jpg"</span>
+  <span class="atr">alt</span>=<span class="val">"Descripción de la imagen (obligatorio)"</span>
+  <span class="atr">width</span>=<span class="val">"400"</span>
+  <span class="atr">height</span>=<span class="val">"300"</span>
+  <span class="atr">loading</span>=<span class="val">"lazy"</span>
+<span class="tag">&gt;</span>
+
+<span class="cm">&lt;!-- Imagen con figura y pie de foto --&gt;</span>
+<span class="tag">&lt;figure&gt;</span>
+  <span class="tag">&lt;img</span> <span class="atr">src</span>=<span class="val">"nutria.jpg"</span> <span class="atr">alt</span>=<span class="val">"Una nutria con laptop"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;figcaption&gt;</span><span class="txt">La nutria programadora 🦦</span><span class="tag">&lt;/figcaption&gt;</span>
+<span class="tag">&lt;/figure&gt;</span>
+
+<span class="cm">&lt;!-- ===== VIDEO ===== --&gt;</span>
+<span class="tag">&lt;video</span> <span class="atr">controls</span> <span class="atr">width</span>=<span class="val">"640"</span> <span class="atr">poster</span>=<span class="val">"miniatura.jpg"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;source</span> <span class="atr">src</span>=<span class="val">"video.mp4"</span> <span class="atr">type</span>=<span class="val">"video/mp4"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;source</span> <span class="atr">src</span>=<span class="val">"video.webm"</span> <span class="atr">type</span>=<span class="val">"video/webm"</span><span class="tag">&gt;</span>
+  <span class="txt">Tu navegador no soporta video.</span>
+<span class="tag">&lt;/video&gt;</span>
+
+<span class="cm">&lt;!-- ===== AUDIO ===== --&gt;</span>
+<span class="tag">&lt;audio</span> <span class="atr">controls</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;source</span> <span class="atr">src</span>=<span class="val">"audio.mp3"</span> <span class="atr">type</span>=<span class="val">"audio/mpeg"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/audio&gt;</span>
+
+<span class="cm">&lt;!-- ===== IFRAME (incrustar otra página) ===== --&gt;</span>
+<span class="tag">&lt;iframe</span>
+  <span class="atr">src</span>=<span class="val">"https://www.youtube.com/embed/dQw4w9WgXcQ"</span>
+  <span class="atr">width</span>=<span class="val">"560"</span> <span class="atr">height</span>=<span class="val">"315"</span>
+  <span class="atr">allowfullscreen</span>
+<span class="tag">&gt;&lt;/iframe&gt;</span></pre>
+    </div>
+
+    <div class="tag-table-wrap">
+      <table>
+        <thead><tr><th>Etiqueta</th><th>Descripción</th><th>Tipo</th></tr></thead>
+        <tbody>
+          <tr><td>&lt;a&gt;</td><td>Ancla/enlace. El atributo href define el destino.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;img&gt;</td><td>Imagen. Requiere src (ruta) y alt (texto alternativo). Auto-cerrada.</td><td><span class="badge media">media</span></td></tr>
+          <tr><td>&lt;figure&gt;</td><td>Contenedor semántico para contenido ilustrativo (imagen, gráfica, código).</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;figcaption&gt;</td><td>Pie de foto o descripción de un &lt;figure&gt;.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;video&gt;</td><td>Reproduce video HTML5 nativo. Atributos: controls, autoplay, loop, muted.</td><td><span class="badge media">media</span></td></tr>
+          <tr><td>&lt;audio&gt;</td><td>Reproduce audio HTML5 nativo.</td><td><span class="badge media">media</span></td></tr>
+          <tr><td>&lt;source&gt;</td><td>Define fuentes alternativas para video o audio. Auto-cerrada.</td><td><span class="badge media">media</span></td></tr>
+          <tr><td>&lt;iframe&gt;</td><td>Incrusta otra página o contenido externo (videos de YouTube, mapas, etc.).</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;canvas&gt;</td><td>Lienzo para dibujo con JavaScript (gráficos, animaciones, juegos).</td><td><span class="badge media">media</span></td></tr>
+          <tr><td>&lt;svg&gt;</td><td>Gráficos vectoriales escalables directamente en HTML.</td><td><span class="badge media">media</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 6 =================== -->
+  <section class="guide-section sec-anchor" id="modulo6">
+    <div class="sec-head">
+      <div class="sec-num purple">06</div>
+      <div class="sec-titles">
+        <div class="sec-title">Formularios</div>
+        <div class="sec-sub">Recibir datos del usuario: inputs, botones y validación</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">formulario.html</span>
+        <span class="code-tag">FORMS</span>
+      </div>
+      <pre><span class="tag">&lt;form</span> <span class="atr">action</span>=<span class="val">"/enviar"</span> <span class="atr">method</span>=<span class="val">"POST"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Texto simple --&gt;</span>
+  <span class="tag">&lt;label</span> <span class="atr">for</span>=<span class="val">"nombre"</span><span class="tag">&gt;</span><span class="txt">Nombre:</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"text"</span> <span class="atr">id</span>=<span class="val">"nombre"</span> <span class="atr">name</span>=<span class="val">"nombre"</span>
+         <span class="atr">placeholder</span>=<span class="val">"Tu nombre"</span> <span class="atr">required</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Email con validación automática --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"email"</span> <span class="atr">name</span>=<span class="val">"correo"</span> <span class="atr">placeholder</span>=<span class="val">"tu@correo.com"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Contraseña --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"password"</span> <span class="atr">name</span>=<span class="val">"pass"</span> <span class="atr">minlength</span>=<span class="val">"8"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Número con rango --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"number"</span> <span class="atr">name</span>=<span class="val">"edad"</span> <span class="atr">min</span>=<span class="val">"1"</span> <span class="atr">max</span>=<span class="val">"120"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Fecha --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"date"</span> <span class="atr">name</span>=<span class="val">"nacimiento"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Color --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"color"</span> <span class="atr">name</span>=<span class="val">"favorito"</span> <span class="atr">value</span>=<span class="val">"#7ab8e0"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- Checkbox y Radio --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"checkbox"</span> <span class="atr">name</span>=<span class="val">"html"</span> <span class="atr">id</span>=<span class="val">"html"</span> <span class="atr">checked</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;label</span> <span class="atr">for</span>=<span class="val">"html"</span><span class="tag">&gt;</span><span class="txt">Me gusta HTML</span><span class="tag">&lt;/label&gt;</span>
+
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"radio"</span> <span class="atr">name</span>=<span class="val">"nivel"</span> <span class="atr">value</span>=<span class="val">"principiante"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;label&gt;</span><span class="txt">Principiante</span><span class="tag">&lt;/label&gt;</span>
+
+  <span class="cm">&lt;!-- Select / desplegable --&gt;</span>
+  <span class="tag">&lt;select</span> <span class="atr">name</span>=<span class="val">"lenguaje"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;option</span> <span class="atr">value</span>=<span class="val">""</span><span class="tag">&gt;</span><span class="txt">Elige un lenguaje</span><span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> <span class="atr">value</span>=<span class="val">"html"</span><span class="tag">&gt;</span><span class="txt">HTML</span><span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> <span class="atr">value</span>=<span class="val">"css"</span><span class="tag">&gt;</span><span class="txt">CSS</span><span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;/select&gt;</span>
+
+  <span class="cm">&lt;!-- Área de texto --&gt;</span>
+  <span class="tag">&lt;textarea</span> <span class="atr">name</span>=<span class="val">"mensaje"</span> <span class="atr">rows</span>=<span class="val">"4"</span> <span class="atr">cols</span>=<span class="val">"40"</span>
+             <span class="atr">placeholder</span>=<span class="val">"Escribe tu mensaje..."</span><span class="tag">&gt;&lt;/textarea&gt;</span>
+
+  <span class="cm">&lt;!-- Botones --&gt;</span>
+  <span class="tag">&lt;button</span> <span class="atr">type</span>=<span class="val">"submit"</span><span class="tag">&gt;</span><span class="txt">Enviar formulario</span><span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;button</span> <span class="atr">type</span>=<span class="val">"reset"</span><span class="tag">&gt;</span><span class="txt">Limpiar</span><span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;input</span> <span class="atr">type</span>=<span class="val">"file"</span> <span class="atr">accept</span>=<span class="val">".jpg,.png"</span><span class="tag">&gt;</span>
+
+<span class="tag">&lt;/form&gt;</span></pre>
+    </div>
+
+    <div class="info-box tip">
+      <span class="info-box-icon">✅</span>
+      <div class="info-box-text"><strong>Validación nativa HTML5:</strong> Los atributos <code>required</code>, <code>min</code>, <code>max</code>, <code>minlength</code>, <code>maxlength</code>, <code>pattern</code> validan los campos automáticamente sin JavaScript. El tipo <code>email</code> valida el formato del correo; <code>url</code> valida URLs.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 7 =================== -->
+  <section class="guide-section sec-anchor" id="modulo7">
+    <div class="sec-head">
+      <div class="sec-num">07</div>
+      <div class="sec-titles">
+        <div class="sec-title">HTML Semántico</div>
+        <div class="sec-sub">Etiquetas con significado: accesibilidad y SEO</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>El <strong>HTML semántico</strong> usa etiquetas que describen el significado del contenido, no solo su apariencia. Esto es crucial para: el <em>SEO</em> (los motores de búsqueda entienden mejor tu página), la <em>accesibilidad</em> (los lectores de pantalla para personas con discapacidad visual funcionan mejor) y la <em>mantenibilidad</em> del código.</p>
+      <p>Antes de HTML5 todo se hacía con <code>&lt;div&gt;</code>. Ahora tenemos etiquetas que describen exactamente qué es cada parte de la página.</p>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">estructura-semantica.html</span>
+        <span class="code-tag">SEMÁNTICA</span>
+      </div>
+      <pre><span class="tag">&lt;body&gt;</span>
+
+  <span class="cm">&lt;!-- Encabezado del sitio (logo, menú principal) --&gt;</span>
+  <span class="tag">&lt;header&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="atr">href</span>=<span class="val">"/"</span><span class="tag">&gt;</span><span class="txt">Inicio</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="atr">href</span>=<span class="val">"/acerca"</span><span class="tag">&gt;</span><span class="txt">Acerca</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+  <span class="tag">&lt;/header&gt;</span>
+
+  <span class="cm">&lt;!-- Contenido principal (único por página) --&gt;</span>
+  <span class="tag">&lt;main&gt;</span>
+
+    <span class="cm">&lt;!-- Sección temática con encabezado --&gt;</span>
+    <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;h2&gt;</span><span class="txt">Sobre HTML5</span><span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="txt">Contenido de la sección...</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="cm">&lt;!-- Artículo independiente (post, noticia) --&gt;</span>
+    <span class="tag">&lt;article&gt;</span>
+      <span class="tag">&lt;header&gt;</span>
+        <span class="tag">&lt;h2&gt;</span><span class="txt">Historia de la Web</span><span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;time</span> <span class="atr">datetime</span>=<span class="val">"1991-08-06"</span><span class="tag">&gt;</span><span class="txt">6 de agosto de 1991</span><span class="tag">&lt;/time&gt;</span>
+      <span class="tag">&lt;/header&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="txt">Tim Berners-Lee publica la primera web...</span><span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;footer&gt;</span><span class="txt">Autor: Tim B-L</span><span class="tag">&lt;/footer&gt;</span>
+    <span class="tag">&lt;/article&gt;</span>
+
+    <span class="cm">&lt;!-- Contenido relacionado pero separable --&gt;</span>
+    <span class="tag">&lt;aside&gt;</span>
+      <span class="tag">&lt;h3&gt;</span><span class="txt">¿Sabías que...?</span><span class="tag">&lt;/h3&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="txt">HTML tiene más de 100 etiquetas.</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/aside&gt;</span>
+
+    <span class="cm">&lt;!-- Detalles expandibles --&gt;</span>
+    <span class="tag">&lt;details&gt;</span>
+      <span class="tag">&lt;summary&gt;</span><span class="txt">Ver más información</span><span class="tag">&lt;/summary&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="txt">Contenido oculto que se expande al hacer clic.</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/details&gt;</span>
+
+  <span class="tag">&lt;/main&gt;</span>
+
+  <span class="cm">&lt;!-- Pie de página del sitio --&gt;</span>
+  <span class="tag">&lt;footer&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="txt">&amp;copy; 2025 Mi Portafolio Digital</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/footer&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span></pre>
+    </div>
+
+    <div class="tag-table-wrap">
+      <table>
+        <thead><tr><th>Etiqueta</th><th>Descripción semántica</th><th>Tipo</th></tr></thead>
+        <tbody>
+          <tr><td>&lt;header&gt;</td><td>Encabezado de la página o de una sección. Suele contener logo y navegación.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;nav&gt;</td><td>Bloque de navegación principal (menú de links).</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;main&gt;</td><td>Contenido principal único de la página. Solo debe haber uno.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;section&gt;</td><td>Sección temática con su propio encabezado. Agrupa contenido relacionado.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;article&gt;</td><td>Contenido autónomo y reutilizable: post de blog, noticia, tarjeta.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;aside&gt;</td><td>Contenido secundario relacionado: barra lateral, notas al margen.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;footer&gt;</td><td>Pie de página del sitio o de un artículo.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;details&gt;</td><td>Widget de contenido colapsable/expandible sin JavaScript.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;summary&gt;</td><td>Título visible del &lt;details&gt;.</td><td><span class="badge inline">inline</span></td></tr>
+          <tr><td>&lt;dialog&gt;</td><td>Ventana modal/diálogo nativo de HTML5.</td><td><span class="badge block">block</span></td></tr>
+          <tr><td>&lt;template&gt;</td><td>Fragmento HTML inactivo que JavaScript puede clonar e insertar.</td><td><span class="badge meta">meta</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- =================== MÓDULO 8 =================== -->
+  <section class="guide-section sec-anchor" id="modulo8">
+    <div class="sec-head">
+      <div class="sec-num blue">08</div>
+      <div class="sec-titles">
+        <div class="sec-title">Atributos Globales</div>
+        <div class="sec-sub">Atributos que puedes usar en cualquier etiqueta HTML</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Los <strong>atributos globales</strong> son especiales porque funcionan en <em>cualquier</em> etiqueta HTML, no solo en algunas. Son la clave para conectar HTML con CSS e JavaScript.</p>
+    </div>
+
+    <div class="attr-grid">
+      <div class="attr-card">
+        <div class="attr-icon">🆔</div>
+        <div class="attr-name">id="nombre"</div>
+        <div class="attr-desc">Identificador único en toda la página. Usado por CSS (#id) y JavaScript (getElementById).</div>
+      </div>
+      <div class="attr-card">
+        <div class="attr-icon">🏷️</div>
+        <div class="attr-name">class="nombre"</div>
+        <div class="attr-desc">Clase reutilizable. Múltiples elementos pueden tener la misma clase. Usado por CSS (.clase).</div>
+      </div>
+      <div class="attr-card">
+        <div class="attr-icon">🎨</div>
+        <div class="attr-name">style="..."</div>
+        <div class="attr-desc">CSS en línea directamente en el elemento. Evitar en proyectos grandes; mejor usar clases CSS.</div>
+      </div>
+      <div class="attr-card">
+        <div class="attr-icon">💬</div>
+        <div class="attr-name">title="texto"</div>
+        <div class="attr-desc">Texto emergente (tooltip) que aparece al pasar el cursor sobre el elemento.</div>
+      </div>
+      <div class="attr-card">
+        <div class="attr-icon">🚫</div>
+        <div class="attr-name">hidden</div>
+        <div class="attr-desc">Oculta el elemento (equivale a display:none). JavaScript puede quitarlo para mostrarlo.</div>
+      </div>
+      <div class="attr-card">
+        <div class="attr-icon">♿</div>
+        <div class="attr-name">tabindex="n"</div>
+        <div class="attr-desc">Controla el orden de navegación con Tab. Esencial para accesibilidad del teclado.</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">atributos-globales.html</span>
+        <span class="code-tag">ATRIBUTOS</span>
+      </div>
+      <pre><span class="cm">&lt;!-- Atributos de datos personalizados (data-*) --&gt;</span>
+<span class="tag">&lt;div</span>
+  <span class="atr">id</span>=<span class="val">"tarjeta-1"</span>
+  <span class="atr">class</span>=<span class="val">"tarjeta activa"</span>
+  <span class="atr">data-lenguaje</span>=<span class="val">"html"</span>
+  <span class="atr">data-nivel</span>=<span class="val">"1"</span>
+  <span class="atr">title</span>=<span class="val">"Tarjeta de HTML"</span>
+  <span class="atr">style</span>=<span class="val">"background: #c7eff8;"</span>
+<span class="tag">&gt;</span>
+  <span class="txt">Contenido de la tarjeta</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Atributos de accesibilidad (ARIA) --&gt;</span>
+<span class="tag">&lt;button</span>
+  <span class="atr">aria-label</span>=<span class="val">"Cerrar menú"</span>
+  <span class="atr">aria-expanded</span>=<span class="val">"false"</span>
+  <span class="atr">role</span>=<span class="val">"button"</span>
+<span class="tag">&gt;</span>
+  <span class="txt">✕</span>
+<span class="tag">&lt;/button&gt;</span>
+
+<span class="cm">&lt;!-- Atributos de idioma y dirección --&gt;</span>
+<span class="tag">&lt;p</span> <span class="atr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span><span class="txt">This text is in English.</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p</span> <span class="atr">dir</span>=<span class="val">"rtl"</span><span class="tag">&gt;</span><span class="txt">Texto de derecha a izquierda</span><span class="tag">&lt;/p&gt;</span>
+
+<span class="cm">&lt;!-- contenteditable: hace el elemento editable --&gt;</span>
+<span class="tag">&lt;div</span> <span class="atr">contenteditable</span>=<span class="val">"true"</span><span class="tag">&gt;</span>
+  <span class="txt">Puedes editar este texto directamente.</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- draggable: permite arrastrar el elemento --&gt;</span>
+<span class="tag">&lt;img</span> <span class="atr">src</span>=<span class="val">"logo.png"</span> <span class="atr">draggable</span>=<span class="val">"true"</span> <span class="atr">alt</span>=<span class="val">"Logo"</span><span class="tag">&gt;</span></pre>
+    </div>
+
+    <div class="info-box note">
+      <span class="info-box-icon">📌</span>
+      <div class="info-box-text"><strong>Atributos data-*:</strong> Puedes crear tus propios atributos con el prefijo <code>data-</code> para guardar información extra en los elementos. JavaScript puede leerlos con <code>element.dataset.lenguaje</code>. Son muy usados en frameworks modernos.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Conclusión -->
+  <div class="conclusion">
+    <h3>🎓 ¿Qué aprendiste?</h3>
+    <p>Recorriste los <strong>8 módulos fundamentales de HTML5</strong>: desde su historia y estructura básica, hasta etiquetas de texto, listas, tablas, multimedia, formularios, semántica avanzada y atributos globales. Con estos conocimientos ya puedes construir páginas web completas y bien estructuradas.</p>
+    <p>Recuerda que HTML es solo el <em>esqueleto</em>. El siguiente paso es combinarlo con <strong>CSS3</strong> para darle estilo visual, y con <strong>JavaScript</strong> para hacerlo interactivo. Juntos, estos tres lenguajes son el trío esencial del desarrollo web front-end.</p>
+    <p>Y como lo vimos en la Tarea 01: gracias a <strong>Tim Berners-Lee</strong>, este lenguaje es libre, abierto y accesible para todos. ¡Ahora te toca a ti crear con él! 🦦</p>
+  </div>
+
+</main>
+
+<footer class="task-footer">
+  <p>🦦 <span>Tarea 03</span> · Programación con IA: Guía HTML5 · Portafolio de Cultura Digital 2 · 2° Semestre de IA</p>
+</footer>
+
+<script>
+  // Barra de progreso de lectura
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = doc.scrollHeight - doc.clientHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    document.getElementById('progressBar').style.width = progress + '%';
+  });
+</script>
+</body>
+</html>
