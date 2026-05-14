@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tarea 06 — Conceptos Generales de Python | Cultura Digital 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --azul-pastel:    #b8d8f0;
+      --amarillo-pastel:#fce9a2;
+      --celeste-pastel: #c7eff8;
+      --blanco:         #ffffff;
+      --azul-medio:     #7ab8e0;
+      --azul-oscuro:    #3a7bbf;
+      --texto-oscuro:   #2c4a6e;
+      --sombra:         rgba(58,123,191,0.15);
+      --bg:             #edf6ff;
+      --code-bg:        #1a2535;
+      --code-top:       #111e2c;
+      --py-blue:        #3572A5;
+      --py-yellow:      #FFD43B;
+      --py-dark:        #1e3a5f;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body{ font-family:'Nunito',sans-serif; background:var(--bg); color:var(--texto-oscuro); overflow-x:hidden; }
+
+    /* PROGRESS BAR */
+    .progress-bar{
+      position:fixed; top:0; left:0; height:4px; z-index:500;
+      background:linear-gradient(90deg, var(--py-blue), var(--py-yellow), var(--azul-medio));
+      width:0%; transition:width .1s; border-radius:0 4px 4px 0;
+      box-shadow:0 0 10px rgba(53,114,165,.5);
+    }
+
+    /* BACK BUTTON */
+    .back-btn{
+      position:fixed; top:22px; left:22px; z-index:300;
+      display:flex; align-items:center; gap:8px;
+      background:var(--blanco); color:var(--azul-oscuro);
+      font-family:'Nunito',sans-serif; font-weight:700; font-size:.88rem;
+      padding:10px 20px 10px 14px; border-radius:30px;
+      box-shadow:0 4px 18px var(--sombra); text-decoration:none;
+      border:2px solid var(--azul-pastel); transition:all .25s;
+    }
+    .back-btn:hover{ background:var(--azul-oscuro); color:var(--blanco); border-color:var(--azul-oscuro); transform:translateX(-4px); }
+    .back-btn svg{ width:16px; height:16px; transition:transform .25s; }
+    .back-btn:hover svg{ transform:translateX(-3px); }
+
+    /* ===== HERO ===== */
+    .hero{
+      min-height:100vh;
+      background:linear-gradient(150deg, #0d1f2d 0%, #1e3a5f 40%, #3572A5 80%, #4a8fc0 100%);
+      position:relative; display:flex; align-items:center;
+      justify-content:center; overflow:hidden; padding:100px 30px 80px;
+    }
+
+    /* Serpiente decorativa (Python logo) */
+    .snake-bg{
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+
+    /* Código Python flotante */
+    .py-snippet{
+      position:absolute; font-family:'Fira Code',monospace;
+      color:rgba(255,255,255,.08); font-weight:400; pointer-events:none;
+      animation:snipFloat 11s ease-in-out infinite; white-space:nowrap;
+    }
+    .py-snippet:nth-child(1){ top:7%;  left:2%;  font-size:.9rem;  animation-delay:0s;   }
+    .py-snippet:nth-child(2){ top:18%; right:3%; font-size:.75rem; animation-delay:2s;   }
+    .py-snippet:nth-child(3){ top:33%; left:1%;  font-size:.85rem; animation-delay:4s;   }
+    .py-snippet:nth-child(4){ top:50%; right:2%; font-size:.8rem;  animation-delay:1s;   }
+    .py-snippet:nth-child(5){ top:65%; left:4%;  font-size:.7rem;  animation-delay:3s;   }
+    .py-snippet:nth-child(6){ top:78%; right:5%; font-size:.9rem;  animation-delay:5s;   }
+    .py-snippet:nth-child(7){ top:25%; left:38%; font-size:.72rem; animation-delay:1.5s; }
+    .py-snippet:nth-child(8){ top:58%; left:34%; font-size:.78rem; animation-delay:3.5s; }
+    @keyframes snipFloat{
+      0%,100%{ transform:translateY(0) rotate(-1deg);  opacity:.08; }
+      50%    { transform:translateY(-18px) rotate(1deg); opacity:.16; }
+    }
+
+    /* Orbes */
+    .hero-orb{
+      position:absolute; border-radius:50%; pointer-events:none;
+      animation:orbF 8s ease-in-out infinite;
+    }
+    .hero-orb:nth-child(1){ width:420px;height:420px; background:radial-gradient(circle,rgba(53,114,165,.3),transparent 70%); top:-110px;right:-110px; animation-delay:0s; }
+    .hero-orb:nth-child(2){ width:260px;height:260px; background:radial-gradient(circle,rgba(255,212,59,.12),transparent 70%); bottom:5%;left:-80px; animation-delay:2.5s; }
+    .hero-orb:nth-child(3){ width:150px;height:150px; background:radial-gradient(circle,rgba(184,216,240,.18),transparent 70%); top:38%;right:14%; animation-delay:5s; }
+    @keyframes orbF{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+
+    .task-chip{
+      position:absolute; top:28px; right:28px;
+      background:var(--py-yellow); color:#1e3a5f;
+      font-weight:800; font-size:.78rem; letter-spacing:1.5px;
+      padding:6px 16px; border-radius:20px; text-transform:uppercase;
+    }
+
+    .hero-inner{
+      position:relative; z-index:5;
+      display:flex; flex-direction:column;
+      align-items:center; text-align:center; gap:20px; max-width:820px;
+    }
+
+    /* Logo Python SVG animado */
+    .py-logo-wrap{
+      animation:logoBob 3.5s ease-in-out infinite;
+      filter:drop-shadow(0 12px 40px rgba(53,114,165,.8));
+    }
+    @keyframes logoBob{
+      0%,100%{ transform:translateY(0) rotate(-2deg); }
+      50%    { transform:translateY(-12px) rotate(2deg); }
+    }
+
+    /* Badges */
+    .mod-badges{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+    .mbadge{
+      background:rgba(255,255,255,.11); backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.22); color:var(--blanco);
+      font-family:'Fira Code',monospace; font-size:.77rem; padding:6px 14px;
+      border-radius:12px; animation:pop .5s ease both;
+    }
+    .mbadge:nth-child(1){ animation-delay:.1s; } .mbadge:nth-child(2){ animation-delay:.2s; }
+    .mbadge:nth-child(3){ animation-delay:.3s; } .mbadge:nth-child(4){ animation-delay:.4s; }
+    .mbadge:nth-child(5){ animation-delay:.5s; } .mbadge:nth-child(6){ animation-delay:.6s; }
+    @keyframes pop{
+      from{ opacity:0; transform:scale(.7) translateY(8px); }
+      to  { opacity:1; transform:scale(1)  translateY(0); }
+    }
+
+    .hero-tag{
+      background:rgba(255,255,255,.12); backdrop-filter:blur(8px);
+      color:var(--py-yellow); font-size:.78rem; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:5px 18px; border-radius:20px;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .hero-title{
+      font-family:'Baloo 2',cursive; font-size:clamp(2.2rem,5.5vw,4rem);
+      font-weight:800; color:var(--blanco); line-height:1.08;
+      text-shadow:0 4px 30px rgba(0,0,0,.4);
+    }
+    .hero-title .acc { color:#7ecef4; }
+    .hero-title .acc2{ color:var(--py-yellow); }
+    .hero-sub{ font-size:1rem; color:rgba(255,255,255,.8); max-width:560px; line-height:1.7; }
+    .hero-stats{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+    .stat-pill{
+      background:rgba(255,255,255,.13); backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.2); color:var(--blanco);
+      font-size:.82rem; font-weight:700; padding:8px 18px; border-radius:20px;
+    }
+
+    /* TOC */
+    .toc-nav{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:8px; }
+    .toc-link{
+      background:rgba(53,114,165,.3); backdrop-filter:blur(6px);
+      border:1px solid rgba(126,206,244,.35); color:#7ecef4;
+      font-size:.76rem; font-weight:700; padding:5px 13px; border-radius:20px;
+      text-decoration:none; transition:all .2s;
+    }
+    .toc-link:hover{ background:rgba(53,114,165,.6); color:var(--blanco); }
+
+    .wave-hero{ position:absolute; bottom:0; left:0; width:100%; line-height:0; }
+
+    /* ===== CONTENIDO ===== */
+    .content{ max-width:1000px; margin:0 auto; padding:60px 28px 80px; }
+    .guide-section{ margin-bottom:64px; }
+    .sec-anchor{ scroll-margin-top:80px; }
+
+    /* Header sección */
+    .sec-head{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+    .sec-num{
+      width:52px; height:52px; border-radius:14px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Baloo 2',cursive; font-size:1.25rem; font-weight:800;
+      color:var(--blanco); box-shadow:0 4px 16px var(--sombra);
+    }
+    .n1{ background:linear-gradient(135deg,var(--py-blue),#4a8fc0);   box-shadow:0 4px 16px rgba(53,114,165,.4); }
+    .n2{ background:linear-gradient(135deg,#e6b800,var(--py-yellow)); color:var(--py-dark); box-shadow:0 4px 16px rgba(230,184,0,.35); }
+    .n3{ background:linear-gradient(135deg,#059669,#10b981);          box-shadow:0 4px 16px rgba(5,150,105,.35); }
+    .n4{ background:linear-gradient(135deg,#7c3aed,#a78bfa);          box-shadow:0 4px 16px rgba(124,58,237,.35); }
+    .n5{ background:linear-gradient(135deg,#ea580c,#fb923c);          box-shadow:0 4px 16px rgba(234,88,12,.35); }
+    .n6{ background:linear-gradient(135deg,#0891b2,#22d3ee);          box-shadow:0 4px 16px rgba(8,145,178,.35); }
+    .n7{ background:linear-gradient(135deg,#db2777,#f472b6);          box-shadow:0 4px 16px rgba(219,39,119,.35); }
+    .n8{ background:linear-gradient(135deg,#15803d,#4ade80);          box-shadow:0 4px 16px rgba(21,128,61,.35); }
+    .n9{ background:linear-gradient(135deg,var(--texto-oscuro),var(--azul-oscuro)); box-shadow:0 4px 16px var(--sombra); }
+
+    .sec-titles .sec-title{ font-family:'Baloo 2',cursive; font-size:1.6rem; font-weight:800; color:var(--texto-oscuro); }
+    .sec-titles .sec-sub  { font-size:.88rem; color:var(--azul-medio); font-weight:600; margin-top:2px; }
+
+    /* Prosa */
+    .prose{
+      font-size:.97rem; line-height:1.82; color:#476a8a;
+      background:var(--blanco); border-radius:18px;
+      padding:24px 28px; box-shadow:0 4px 20px var(--sombra); margin-bottom:20px;
+    }
+    .prose p{ margin-bottom:12px; } .prose p:last-child{ margin-bottom:0; }
+    .prose strong{ color:var(--texto-oscuro); }
+    .prose code{
+      font-family:'Fira Code',monospace; font-size:.84em;
+      background:#e8f2fb; color:var(--py-blue);
+      padding:2px 7px; border-radius:6px;
+    }
+
+    /* Info boxes */
+    .info-box{
+      border-radius:18px; padding:18px 22px; margin-bottom:20px;
+      display:flex; gap:14px; align-items:flex-start;
+    }
+    .ib-tip  { background:#e8f7f0; border-left:5px solid #059669; }
+    .ib-warn { background:#fff8e1; border-left:5px solid #e6b800; }
+    .ib-note { background:#e8f2fb; border-left:5px solid var(--azul-medio); }
+    .ib-py   { background:#eef4fb; border-left:5px solid var(--py-blue); }
+    .info-box-icon{ font-size:1.4rem; flex-shrink:0; margin-top:2px; }
+    .info-box-text{ font-size:.91rem; line-height:1.7; color:#476a8a; }
+    .info-box-text strong{ color:var(--texto-oscuro); }
+    .info-box-text code{
+      font-family:'Fira Code',monospace; font-size:.83em;
+      background:rgba(53,114,165,.1); color:var(--py-blue);
+      padding:1px 6px; border-radius:5px;
+    }
+
+    /* Code blocks */
+    .code-wrap{ margin-bottom:22px; border-radius:14px; overflow:hidden; box-shadow:0 6px 24px rgba(0,0,0,.2); }
+    .code-header{
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--code-top); padding:10px 18px;
+    }
+    .code-dots{ display:flex; gap:6px; }
+    .cd{ width:11px; height:11px; border-radius:50%; }
+    .cd.r{ background:#ff5f57; } .cd.y{ background:#febc2e; } .cd.g{ background:#28c840; }
+    .code-label{ font-family:'Fira Code',monospace; font-size:.7rem; color:rgba(255,255,255,.35); letter-spacing:.5px; }
+    .code-tag{
+      font-size:.68rem; font-weight:700; padding:2px 10px;
+      border-radius:10px; letter-spacing:.5px; text-transform:uppercase;
+      background:rgba(53,114,165,.45); color:#7ecef4;
+    }
+    pre{
+      background:var(--code-bg); padding:20px 22px; overflow-x:auto;
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      line-height:1.8; color:#cdd9e5; margin:0;
+    }
+
+    /* Python syntax highlight */
+    .kw  { color:#cc99cd; font-weight:500; }  /* keywords */
+    .fn  { color:#6cb6ff; }                   /* functions */
+    .str { color:#8ddb8c; }                   /* strings */
+    .num { color:#f9c14e; }                   /* numbers */
+    .cm  { color:#54647a; font-style:italic; }/* comments */
+    .bi  { color:#ffa657; }                   /* builtins */
+    .op  { color:#94a3b8; }                   /* operators/punct */
+    .cls { color:#e8bf6a; }                   /* class names */
+    .dec { color:#a5d6ff; }                   /* decorators */
+    .var { color:#cdd9e5; }                   /* variables */
+    .bool{ color:#f47067; }                   /* True/False/None */
+
+    /* Tabla */
+    .table-wrap{
+      background:var(--blanco); border-radius:18px; overflow:hidden;
+      box-shadow:0 4px 20px var(--sombra); margin-bottom:22px; overflow-x:auto;
+    }
+    table{ width:100%; border-collapse:collapse; }
+    thead th{
+      background:linear-gradient(135deg,var(--py-blue),#4a8fc0);
+      color:var(--blanco); font-family:'Baloo 2',cursive; font-size:.88rem;
+      font-weight:700; padding:13px 18px; text-align:left;
+    }
+    tbody tr:nth-child(even){ background:#f4f9ff; }
+    tbody tr:hover{ background:var(--celeste-pastel); transition:background .2s; }
+    tbody td{
+      padding:10px 18px; font-size:.86rem; color:#476a8a;
+      vertical-align:middle; border-bottom:1px solid #e8f2fb;
+    }
+    tbody td:first-child{
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      color:var(--py-blue); font-weight:600; white-space:nowrap;
+    }
+    .tbadge{
+      display:inline-block; font-size:.67rem; font-weight:700;
+      padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:.5px;
+    }
+    .tb-num  { background:#fef3c7; color:#92400e; }
+    .tb-seq  { background:#dcfce7; color:#15803d; }
+    .tb-map  { background:#e0f2fe; color:#0369a1; }
+    .tb-set  { background:#fce7f3; color:#9d174d; }
+    .tb-bool { background:#fdecea; color:#b91c1c; }
+    .tb-none { background:#f3e8ff; color:#6d28d9; }
+    .tb-mutable   { background:#dcfce7; color:#15803d; }
+    .tb-immutable { background:#fef3c7; color:#92400e; }
+
+    /* Cards de conceptos */
+    .concept-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px; margin-bottom:22px; }
+    .concept-card{
+      background:var(--blanco); border-radius:18px; padding:22px 20px;
+      box-shadow:0 4px 18px var(--sombra); border-top:5px solid;
+      transition:transform .25s, box-shadow .25s;
+    }
+    .concept-card:hover{ transform:translateY(-6px); box-shadow:0 14px 32px var(--sombra); }
+    .concept-card:nth-child(1){ border-color:var(--py-blue); }
+    .concept-card:nth-child(2){ border-color:#10b981; }
+    .concept-card:nth-child(3){ border-color:#f59e0b; }
+    .concept-card:nth-child(4){ border-color:#8b5cf6; }
+    .concept-card:nth-child(5){ border-color:#ef4444; }
+    .concept-card:nth-child(6){ border-color:#06b6d4; }
+    .cc-icon{ font-size:1.8rem; margin-bottom:10px; }
+    .cc-title{ font-family:'Baloo 2',cursive; font-size:1.05rem; font-weight:800; color:var(--texto-oscuro); margin-bottom:6px; }
+    .cc-desc{ font-size:.83rem; color:#6a90b5; line-height:1.6; }
+
+    /* Timeline de historia */
+    .timeline{ position:relative; padding-left:28px; margin-bottom:20px; }
+    .timeline::before{
+      content:''; position:absolute;
+      left:8px; top:6px; bottom:6px; width:3px;
+      background:linear-gradient(180deg,var(--py-blue),var(--celeste-pastel));
+      border-radius:4px;
+    }
+    .tl-item{ position:relative; margin-bottom:24px; }
+    .tl-item:last-child{ margin-bottom:0; }
+    .tl-dot{
+      position:absolute; left:-24px; top:5px;
+      width:14px; height:14px;
+      background:var(--blanco); border:3px solid var(--py-blue); border-radius:50%;
+    }
+    .tl-year{ font-family:'Baloo 2',cursive; font-size:.82rem; font-weight:800; color:var(--py-blue); letter-spacing:1px; margin-bottom:3px; }
+    .tl-title{ font-weight:700; color:var(--texto-oscuro); font-size:.92rem; }
+    .tl-desc { font-size:.87rem; color:#476a8a; line-height:1.6; }
+
+    /* Output demo */
+    .output-box{
+      background:#0d1f2d; border-radius:0 0 14px 14px;
+      padding:14px 22px; margin-bottom:22px;
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      line-height:1.7; color:#86efac;
+      border-top:2px dashed rgba(134,239,172,.2);
+    }
+    .output-label{
+      display:inline-block; background:rgba(134,239,172,.15); color:#86efac;
+      font-size:.67rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+      padding:3px 12px; border-radius:8px 8px 0 0; margin-bottom:-2px;
+    }
+
+    /* Divisor */
+    .divider{
+      height:3px; margin:10px 0 54px;
+      background:linear-gradient(90deg,transparent,var(--azul-pastel),var(--amarillo-pastel),transparent);
+      border-radius:4px;
+    }
+
+    /* Comparación */
+    .compare-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+    @media(max-width:600px){ .compare-grid{ grid-template-columns:1fr; } }
+    .compare-card{
+      background:var(--blanco); border-radius:16px; padding:18px 20px;
+      box-shadow:0 4px 16px var(--sombra);
+    }
+    .compare-card.good{ border-top:4px solid #10b981; }
+    .compare-card.bad { border-top:4px solid #ef4444; }
+    .compare-title{
+      font-family:'Baloo 2',cursive; font-size:.95rem; font-weight:800;
+      margin-bottom:10px;
+    }
+    .compare-card.good .compare-title{ color:#059669; }
+    .compare-card.bad  .compare-title{ color:#dc2626; }
+
+    /* Conclusión */
+    .conclusion{
+      background:linear-gradient(135deg,var(--texto-oscuro),var(--azul-oscuro));
+      border-radius:22px; padding:36px 38px;
+      color:var(--blanco); position:relative; overflow:hidden;
+    }
+    .conclusion::before{ content:'🐍'; position:absolute; right:24px; bottom:16px; font-size:5rem; opacity:.1; }
+    .conclusion::after { content:'def main():'; position:absolute; left:28px; top:18px; font-family:'Fira Code',monospace; font-size:.85rem; color:rgba(255,255,255,.07); }
+    .conclusion h3{ font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:var(--py-yellow); margin-bottom:14px; }
+    .conclusion p{ font-size:.97rem; line-height:1.8; color:rgba(255,255,255,.85); margin-bottom:10px; }
+    .conclusion p:last-child{ margin-bottom:0; }
+
+    /* Footer */
+    .task-footer{ background:var(--texto-oscuro); color:rgba(255,255,255,.45); text-align:center; padding:24px 20px; font-size:.82rem; }
+    .task-footer span{ color:var(--py-yellow); font-weight:700; }
+
+    @media(max-width:600px){
+      .content{ padding:40px 16px 60px; }
+      .hero-stats{ gap:8px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<a class="back-btn" href="index.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  Regresar al portafolio
+</a>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+
+  <!-- Código flotante -->
+  <div class="snake-bg">
+    <div class="py-snippet">def saludar(nombre): return f"Hola {nombre}"</div>
+    <div class="py-snippet">import pandas as pd  # análisis de datos</div>
+    <div class="py-snippet">lista = [x**2 for x in range(10)]</div>
+    <div class="py-snippet">class Persona:  def __init__(self, nombre):</div>
+    <div class="py-snippet">if __name__ == "__main__":  main()</div>
+    <div class="py-snippet">print("¡Python es increíble!")</div>
+    <div class="py-snippet">for item in coleccion:  print(item)</div>
+    <div class="py-snippet">try:  result = dividir(a, b)  except ZeroDivisionError:</div>
+  </div>
+
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+
+  <div class="task-chip">✦ Tarea 06</div>
+
+  <div class="hero-inner">
+
+    <!-- Logo Python SVG -->
+    <div class="py-logo-wrap">
+      <svg width="110" height="110" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pyA" x1="12.959%" y1="12.039%" x2="79.639%" y2="78.201%">
+            <stop offset="0" stop-color="#387EB8"/><stop offset="1" stop-color="#366994"/>
+          </linearGradient>
+          <linearGradient id="pyB" x1="19.128%" y1="20.579%" x2="90.742%" y2="88.429%">
+            <stop offset="0" stop-color="#FFE052"/><stop offset="1" stop-color="#FFC331"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#pyA)" d="M126.916.072c-64.832 0-60.784 28.115-60.784 28.115l.072 29.128h61.868v8.745H41.631S.145 61.355.145 126.77c0 65.417 36.21 63.097 36.21 63.097h21.61v-30.356s-1.165-36.21 35.632-36.21h61.362s34.475.557 34.475-33.319V33.97S194.67.072 126.916.072zM92.802 19.66a11.12 11.12 0 0 1 11.13 11.13 11.12 11.12 0 0 1-11.13 11.13 11.12 11.12 0 0 1-11.13-11.13 11.12 11.12 0 0 1 11.13-11.13z"/>
+        <path fill="url(#pyB)" d="M128.757 254.126c64.832 0 60.784-28.115 60.784-28.115l-.072-29.127H127.6v-8.745h86.441s41.486 4.705 41.486-60.712c0-65.416-36.21-63.096-36.21-63.096h-21.61v30.355s1.165 36.21-35.632 36.21h-61.362s-34.475-.557-34.475 33.32v56.013s-5.235 33.897 62.518 33.897zm34.114-19.586a11.12 11.12 0 0 1-11.13-11.13 11.12 11.12 0 0 1 11.13-11.13 11.12 11.12 0 0 1 11.13 11.13 11.12 11.12 0 0 1-11.13 11.13z"/>
+      </svg>
+    </div>
+
+    <div class="mod-badges">
+      <span class="mbadge">variables</span>
+      <span class="mbadge">tipos de datos</span>
+      <span class="mbadge">funciones</span>
+      <span class="mbadge">POO</span>
+      <span class="mbadge">módulos</span>
+      <span class="mbadge">excepciones</span>
+    </div>
+
+    <div class="hero-tag">🐍 Cultura Digital 2 · Conceptos Generales</div>
+    <h1 class="hero-title">
+      Conceptos Generales<br>de <span class="acc">Py</span><span class="acc2">thon</span>
+    </h1>
+    <p class="hero-sub">Explora en profundidad los fundamentos del lenguaje de programación más popular del mundo: su historia, tipos de datos, estructuras, funciones, POO y ecosistema.</p>
+
+    <div class="hero-stats">
+      <span class="stat-pill">📚 9 módulos</span>
+      <span class="stat-pill">🐍 Desde cero</span>
+      <span class="stat-pill">💡 Ejemplos reales</span>
+      <span class="stat-pill">⚡ Python 3.x</span>
+    </div>
+
+    <nav class="toc-nav">
+      <a class="toc-link" href="#mod1">1. Historia</a>
+      <a class="toc-link" href="#mod2">2. Características</a>
+      <a class="toc-link" href="#mod3">3. Variables y Tipos</a>
+      <a class="toc-link" href="#mod4">4. Operadores</a>
+      <a class="toc-link" href="#mod5">5. Estructuras</a>
+      <a class="toc-link" href="#mod6">6. Colecciones</a>
+      <a class="toc-link" href="#mod7">7. Funciones</a>
+      <a class="toc-link" href="#mod8">8. POO</a>
+      <a class="toc-link" href="#mod9">9. Módulos y Ecosistema</a>
+    </nav>
+  </div>
+
+  <div class="wave-hero">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#edf6ff" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,30 1440,40 L1440,80 L0,80 Z"/>
+    </svg>
+  </div>
+</header>
+
+<!-- ===== CONTENIDO ===== -->
+<main class="content">
+
+  <!-- ======= MÓDULO 1: HISTORIA ======= -->
+  <section class="guide-section sec-anchor" id="mod1">
+    <div class="sec-head">
+      <div class="sec-num n1">01</div>
+      <div class="sec-titles">
+        <div class="sec-title">Historia y Origen de Python</div>
+        <div class="sec-sub">De un proyecto navideño a dominar la IA y la ciencia de datos</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p><strong>Python</strong> fue creado por el programador neerlandés <strong>Guido van Rossum</strong> a finales de los años 1980. Durante las vacaciones de Navidad de 1989, mientras trabajaba en el Centro de Matemáticas e Informática (CWI) de Ámsterdam, Guido comenzó a escribir el intérprete de un nuevo lenguaje que sería sucesor del lenguaje <em>ABC</em>. Su nombre no viene de la serpiente, sino del programa de comedia británico <strong>Monty Python's Flying Circus</strong>, del que Guido era fanático.</p>
+      <p>La primera versión pública, <strong>Python 0.9.0</strong>, se lanzó en febrero de 1991. Desde entonces el lenguaje ha evolucionado para convertirse en uno de los más usados del mundo, siendo el lenguaje número uno en inteligencia artificial, ciencia de datos, automatización y enseñanza de programación.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">1989</div>
+        <div class="tl-title">Creación del primer intérprete</div>
+        <div class="tl-desc">Guido van Rossum comienza a escribir Python como proyecto navideño personal en Amsterdam.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">1991</div>
+        <div class="tl-title">Python 0.9.0 — Primera versión pública</div>
+        <div class="tl-desc">Se publica con funciones básicas: clases, herencia, manejo de excepciones y tipos centrales.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">1994</div>
+        <div class="tl-title">Python 1.0</div>
+        <div class="tl-desc">Incluye herramientas funcionales: lambda, map, filter y reduce.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2000</div>
+        <div class="tl-title">Python 2.0 — Comprensión de listas y recolección de basura</div>
+        <div class="tl-desc">Agrega list comprehensions, recolección de basura cíclica y soporte Unicode.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2008</div>
+        <div class="tl-title">Python 3.0 — La gran reescritura</div>
+        <div class="tl-desc">Versión que no es retrocompatible con Python 2. Limpia inconsistencias y mejora Unicode, I/O y más.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2020</div>
+        <div class="tl-title">Fin de soporte de Python 2</div>
+        <div class="tl-desc">Python 2 llega a su fin de vida. Todo el mundo migra a Python 3. El ecosistema de IA explota.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Hoy</div>
+        <div class="tl-title">Lenguaje #1 del mundo</div>
+        <div class="tl-desc">Python lidera los índices TIOBE y Stack Overflow. Es el lenguaje estándar de IA, ML y data science.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 2: CARACTERÍSTICAS ======= -->
+  <section class="guide-section sec-anchor" id="mod2">
+    <div class="sec-head">
+      <div class="sec-num n2">02</div>
+      <div class="sec-titles">
+        <div class="sec-title">Características Principales</div>
+        <div class="sec-sub">¿Por qué Python es tan popular y poderoso?</div>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="cc-icon">📖</div>
+        <div class="cc-title">Sintaxis Legible</div>
+        <div class="cc-desc">Python usa indentación obligatoria en lugar de llaves. El código se parece al pseudocódigo en inglés, haciéndolo muy fácil de leer y aprender.</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-icon">🔄</div>
+        <div class="cc-title">Interpretado</div>
+        <div class="cc-desc">No necesita compilación previa. El intérprete ejecuta el código línea por línea, lo que facilita el desarrollo y la depuración.</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-icon">🌐</div>
+        <div class="cc-title">Multiplataforma</div>
+        <div class="cc-desc">El mismo código Python funciona en Windows, macOS y Linux sin modificaciones. Un código, muchas plataformas.</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-icon">🦆</div>
+        <div class="cc-title">Tipado Dinámico</div>
+        <div class="cc-desc">No necesitas declarar el tipo de una variable. Python lo infiere automáticamente en tiempo de ejecución. Esto se llama "duck typing".</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-icon">📦</div>
+        <div class="cc-title">Multiparadigma</div>
+        <div class="cc-desc">Soporta programación imperativa, orientada a objetos y funcional. Elige el paradigma que mejor se adapte a tu problema.</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-icon">🏗️</div>
+        <div class="cc-title">Baterías incluidas</div>
+        <div class="cc-desc">Su librería estándar es enorme: manejo de archivos, redes, matemáticas, fechas, JSON, expresiones regulares y mucho más, sin instalar nada extra.</div>
+      </div>
+    </div>
+
+    <div class="info-box ib-py">
+      <span class="info-box-icon">🐍</span>
+      <div class="info-box-text"><strong>El Zen de Python:</strong> Python tiene una filosofía de diseño plasmada en el "Zen of Python" (PEP 20). Puedes verla ejecutando <code>import this</code> en cualquier intérprete Python. Principios clave: "Bello es mejor que feo", "Explícito es mejor que implícito", "Simple es mejor que complejo".</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 3: VARIABLES Y TIPOS ======= -->
+  <section class="guide-section sec-anchor" id="mod3">
+    <div class="sec-head">
+      <div class="sec-num n3">03</div>
+      <div class="sec-titles">
+        <div class="sec-title">Variables y Tipos de Datos</div>
+        <div class="sec-sub">Cómo almacenar y clasificar la información en Python</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>En Python, una <strong>variable</strong> es un nombre que apunta a un valor almacenado en memoria. No es necesario declarar el tipo: Python lo detecta automáticamente. Las variables se crean con el operador de asignación <code>=</code>. Los nombres deben comenzar con letra o guion bajo, no con número, y son sensibles a mayúsculas.</p>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">variables_tipos.py</span>
+        <span class="code-tag">TIPOS</span>
+      </div>
+      <pre><span class="cm"># ===== TIPOS NUMÉRICOS =====</span>
+<span class="var">entero</span>    = <span class="num">42</span>              <span class="cm"># int</span>
+<span class="var">negativo</span>  = <span class="num">-15</span>
+<span class="var">decimal</span>   = <span class="num">3.14159</span>        <span class="cm"># float</span>
+<span class="var">complejo</span>  = <span class="num">2</span> + <span class="num">3</span><span class="op">j</span>         <span class="cm"># complex</span>
+
+<span class="cm"># ===== TEXTO =====</span>
+<span class="var">nombre</span>    = <span class="str">"Cultura Digital"</span>
+<span class="var">ciudad</span>    = <span class="str">'Tuxtla Gutiérrez'</span>
+<span class="var">parrafo</span>   = <span class="str">"""Texto
+en múltiples
+líneas"""</span>
+
+<span class="cm"># f-string: interpolación (Python 3.6+)</span>
+<span class="var">semestre</span>  = <span class="num">2</span>
+<span class="var">mensaje</span>   = <span class="str">f"Bienvenido al semestre </span><span class="op">{</span><span class="var">semestre</span><span class="op">}</span><span class="str"> de IA"</span>
+<span class="bi">print</span>(<span class="var">mensaje</span>)   <span class="cm"># → Bienvenido al semestre 2 de IA</span>
+
+<span class="cm"># ===== BOOLEANOS =====</span>
+<span class="var">activo</span>    = <span class="bool">True</span>
+<span class="var">cerrado</span>   = <span class="bool">False</span>
+<span class="var">nulo</span>      = <span class="bool">None</span>          <span class="cm"># ausencia de valor</span>
+
+<span class="cm"># ===== VERIFICAR TIPO =====</span>
+<span class="bi">print</span>(<span class="bi">type</span>(<span class="var">entero</span>))    <span class="cm"># → &lt;class 'int'&gt;</span>
+<span class="bi">print</span>(<span class="bi">type</span>(<span class="var">nombre</span>))    <span class="cm"># → &lt;class 'str'&gt;</span>
+<span class="bi">print</span>(<span class="bi">isinstance</span>(<span class="var">decimal</span>, <span class="bi">float</span>))  <span class="cm"># → True</span>
+
+<span class="cm"># ===== CONVERSIÓN DE TIPOS =====</span>
+<span class="var">numero_str</span> = <span class="str">"100"</span>
+<span class="var">numero_int</span> = <span class="bi">int</span>(<span class="var">numero_str</span>)   <span class="cm"># str → int</span>
+<span class="var">como_float</span> = <span class="bi">float</span>(<span class="var">numero_int</span>) <span class="cm"># int → float</span>
+<span class="var">como_str</span>   = <span class="bi">str</span>(<span class="num">42</span>)            <span class="cm"># int → str</span>
+<span class="var">como_bool</span>  = <span class="bi">bool</span>(<span class="num">0</span>)            <span class="cm"># → False (0 es falsy)</span></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Nombre en Python</th><th>Ejemplo</th><th>Categoría</th></tr></thead>
+        <tbody>
+          <tr><td>int</td><td>Entero</td><td>42, -7, 0</td><td><span class="tbadge tb-num">numérico</span></td></tr>
+          <tr><td>float</td><td>Decimal / flotante</td><td>3.14, -0.5, 1.0e10</td><td><span class="tbadge tb-num">numérico</span></td></tr>
+          <tr><td>complex</td><td>Número complejo</td><td>2+3j, -1j</td><td><span class="tbadge tb-num">numérico</span></td></tr>
+          <tr><td>str</td><td>Cadena de texto</td><td>"Hola", 'Python'</td><td><span class="tbadge tb-seq">secuencia</span></td></tr>
+          <tr><td>bool</td><td>Booleano</td><td>True, False</td><td><span class="tbadge tb-bool">lógico</span></td></tr>
+          <tr><td>None</td><td>Nulo / ausencia de valor</td><td>None</td><td><span class="tbadge tb-none">especial</span></td></tr>
+          <tr><td>list</td><td>Lista (mutable)</td><td>[1, 2, 3]</td><td><span class="tbadge tb-seq">secuencia</span></td></tr>
+          <tr><td>tuple</td><td>Tupla (inmutable)</td><td>(1, 2, 3)</td><td><span class="tbadge tb-seq">secuencia</span></td></tr>
+          <tr><td>dict</td><td>Diccionario</td><td>{"key": "val"}</td><td><span class="tbadge tb-map">mapeo</span></td></tr>
+          <tr><td>set</td><td>Conjunto (sin duplicados)</td><td>{1, 2, 3}</td><td><span class="tbadge tb-set">conjunto</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 4: OPERADORES ======= -->
+  <section class="guide-section sec-anchor" id="mod4">
+    <div class="sec-head">
+      <div class="sec-num n4">04</div>
+      <div class="sec-titles">
+        <div class="sec-title">Operadores</div>
+        <div class="sec-sub">Aritméticos, de comparación, lógicos, de asignación e identidad</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">operadores.py</span>
+        <span class="code-tag">OPERADORES</span>
+      </div>
+      <pre><span class="cm"># ===== ARITMÉTICOS =====</span>
+<span class="bi">print</span>(<span class="num">10</span> + <span class="num">3</span>)   <span class="cm"># 13  → suma</span>
+<span class="bi">print</span>(<span class="num">10</span> - <span class="num">3</span>)   <span class="cm"># 7   → resta</span>
+<span class="bi">print</span>(<span class="num">10</span> * <span class="num">3</span>)   <span class="cm"># 30  → multiplicación</span>
+<span class="bi">print</span>(<span class="num">10</span> / <span class="num">3</span>)   <span class="cm"># 3.333... → división (siempre float)</span>
+<span class="bi">print</span>(<span class="num">10</span> // <span class="num">3</span>)  <span class="cm"># 3   → división entera (floor)</span>
+<span class="bi">print</span>(<span class="num">10</span> % <span class="num">3</span>)   <span class="cm"># 1   → módulo (resto)</span>
+<span class="bi">print</span>(<span class="num">2</span> ** <span class="num">8</span>)   <span class="cm"># 256 → potencia</span>
+
+<span class="cm"># ===== COMPARACIÓN (devuelven bool) =====</span>
+<span class="bi">print</span>(<span class="num">5</span> == <span class="num">5</span>)   <span class="cm"># True  → igual a</span>
+<span class="bi">print</span>(<span class="num">5</span> != <span class="num">3</span>)   <span class="cm"># True  → diferente de</span>
+<span class="bi">print</span>(<span class="num">5</span> &gt; <span class="num">3</span>)    <span class="cm"># True  → mayor que</span>
+<span class="bi">print</span>(<span class="num">5</span> &lt; <span class="num">3</span>)    <span class="cm"># False → menor que</span>
+<span class="bi">print</span>(<span class="num">5</span> &gt;= <span class="num">5</span>)   <span class="cm"># True  → mayor o igual</span>
+
+<span class="cm"># ===== LÓGICOS =====</span>
+<span class="bi">print</span>(<span class="bool">True</span> <span class="kw">and</span> <span class="bool">False</span>)  <span class="cm"># False → Y lógico</span>
+<span class="bi">print</span>(<span class="bool">True</span> <span class="kw">or</span>  <span class="bool">False</span>)  <span class="cm"># True  → O lógico</span>
+<span class="bi">print</span>(<span class="kw">not</span> <span class="bool">True</span>)         <span class="cm"># False → negación</span>
+
+<span class="cm"># ===== ASIGNACIÓN AUMENTADA =====</span>
+<span class="var">x</span> = <span class="num">10</span>
+<span class="var">x</span> += <span class="num">5</span>     <span class="cm"># x = x + 5  → 15</span>
+<span class="var">x</span> -= <span class="num">3</span>     <span class="cm"># x = x - 3  → 12</span>
+<span class="var">x</span> *= <span class="num">2</span>     <span class="cm"># x = x * 2  → 24</span>
+<span class="var">x</span> //= <span class="num">5</span>    <span class="cm"># x = x // 5 → 4</span>
+
+<span class="cm"># ===== IDENTIDAD Y PERTENENCIA =====</span>
+<span class="var">a</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+<span class="bi">print</span>(<span class="num">2</span> <span class="kw">in</span> <span class="var">a</span>)        <span class="cm"># True  → está en la lista</span>
+<span class="bi">print</span>(<span class="num">5</span> <span class="kw">not in</span> <span class="var">a</span>)    <span class="cm"># True  → no está</span>
+<span class="var">b</span> = <span class="var">a</span>
+<span class="bi">print</span>(<span class="var">a</span> <span class="kw">is</span> <span class="var">b</span>)         <span class="cm"># True  → mismo objeto en memoria</span>
+<span class="bi">print</span>(<span class="var">a</span> <span class="kw">is not</span> [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]) <span class="cm"># True  → objeto diferente</span></pre>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 5: ESTRUCTURAS DE CONTROL ======= -->
+  <section class="guide-section sec-anchor" id="mod5">
+    <div class="sec-head">
+      <div class="sec-num n5">05</div>
+      <div class="sec-titles">
+        <div class="sec-title">Estructuras de Control</div>
+        <div class="sec-sub">Condicionales, bucles y control de flujo</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">control_flujo.py</span>
+        <span class="code-tag">CONTROL</span>
+      </div>
+      <pre><span class="cm"># ===== CONDICIONALES if / elif / else =====</span>
+<span class="var">nota</span> = <span class="num">85</span>
+
+<span class="kw">if</span> <span class="var">nota</span> >= <span class="num">90</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">"Excelente"</span>)
+<span class="kw">elif</span> <span class="var">nota</span> >= <span class="num">70</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">"Aprobado"</span>)     <span class="cm"># ← se ejecuta este</span>
+<span class="kw">elif</span> <span class="var">nota</span> >= <span class="num">60</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">"Suficiente"</span>)
+<span class="kw">else</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">"Reprobado"</span>)
+
+<span class="cm"># Operador ternario (una línea)</span>
+<span class="var">resultado</span> = <span class="str">"Aprobado"</span> <span class="kw">if</span> <span class="var">nota</span> >= <span class="num">70</span> <span class="kw">else</span> <span class="str">"Reprobado"</span>
+
+<span class="cm"># ===== BUCLE for =====</span>
+<span class="cm"># Iterar sobre una colección</span>
+<span class="var">frutas</span> = [<span class="str">"mango"</span>, <span class="str">"guayaba"</span>, <span class="str">"papaya"</span>]
+<span class="kw">for</span> <span class="var">fruta</span> <span class="kw">in</span> <span class="var">frutas</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">f"Fruta: </span><span class="op">{</span><span class="var">fruta</span><span class="op">}</span><span class="str">"</span>)
+
+<span class="cm"># range(): generar secuencias de números</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">5</span>)<span class="op">:</span>         <span class="cm"># 0, 1, 2, 3, 4</span>
+    <span class="bi">print</span>(<span class="var">i</span>)
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">1</span>, <span class="num">10</span>, <span class="num">2</span>)<span class="op">:</span> <span class="cm"># 1, 3, 5, 7, 9</span>
+    <span class="bi">print</span>(<span class="var">i</span>)
+
+<span class="cm"># ===== BUCLE while =====</span>
+<span class="var">contador</span> = <span class="num">0</span>
+<span class="kw">while</span> <span class="var">contador</span> < <span class="num">5</span><span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">f"Vuelta </span><span class="op">{</span><span class="var">contador</span><span class="op">}</span><span class="str">"</span>)
+    <span class="var">contador</span> += <span class="num">1</span>
+
+<span class="cm"># ===== CONTROL: break, continue, pass =====</span>
+<span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>)<span class="op">:</span>
+    <span class="kw">if</span> <span class="var">n</span> == <span class="num">3</span><span class="op">:</span>
+        <span class="kw">continue</span>   <span class="cm"># salta el 3</span>
+    <span class="kw">if</span> <span class="var">n</span> == <span class="num">7</span><span class="op">:</span>
+        <span class="kw">break</span>      <span class="cm"># detiene el bucle en 7</span>
+    <span class="bi">print</span>(<span class="var">n</span>)        <span class="cm"># imprime: 0,1,2,4,5,6</span>
+
+<span class="cm"># ===== COMPRENSIÓN DE LISTAS (list comprehension) =====</span>
+<span class="var">cuadrados</span> = [<span class="var">x</span>**<span class="num">2</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">1</span>, <span class="num">6</span>)]
+<span class="cm"># → [1, 4, 9, 16, 25]</span>
+
+<span class="var">pares</span> = [<span class="var">x</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">20</span>) <span class="kw">if</span> <span class="var">x</span> % <span class="num">2</span> == <span class="num">0</span>]
+<span class="cm"># → [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</span></pre>
+    </div>
+
+    <div class="info-box ib-tip">
+      <span class="info-box-icon">💡</span>
+      <div class="info-box-text"><strong>Indentación obligatoria:</strong> Python no usa llaves <code>{ }</code> para delimitar bloques. En su lugar, usa <strong>espacios o tabulaciones</strong> (se recomiendan 4 espacios). Una indentación incorrecta produce un <code>IndentationError</code>. Esto fuerza código visualmente limpio y consistente.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 6: COLECCIONES ======= -->
+  <section class="guide-section sec-anchor" id="mod6">
+    <div class="sec-head">
+      <div class="sec-num n6">06</div>
+      <div class="sec-titles">
+        <div class="sec-title">Colecciones de Datos</div>
+        <div class="sec-sub">Listas, tuplas, diccionarios y conjuntos en detalle</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">colecciones.py</span>
+        <span class="code-tag">COLECCIONES</span>
+      </div>
+      <pre><span class="cm"># ===== LIST — mutable, ordenada, permite duplicados =====</span>
+<span class="var">materias</span> = [<span class="str">"Cultura Digital"</span>, <span class="str">"Matemáticas"</span>, <span class="str">"Inglés"</span>]
+<span class="var">materias</span>.<span class="fn">append</span>(<span class="str">"Python"</span>)          <span class="cm"># agregar al final</span>
+<span class="var">materias</span>.<span class="fn">insert</span>(<span class="num">1</span>, <span class="str">"Física"</span>)        <span class="cm"># insertar en posición</span>
+<span class="var">materias</span>.<span class="fn">remove</span>(<span class="str">"Inglés"</span>)          <span class="cm"># eliminar por valor</span>
+<span class="var">materias</span>.<span class="fn">pop</span>()                     <span class="cm"># eliminar último</span>
+<span class="var">materias</span>.<span class="fn">sort</span>()                    <span class="cm"># ordenar</span>
+<span class="bi">print</span>(<span class="var">materias</span>[<span class="num">0</span>])                 <span class="cm"># acceso por índice</span>
+<span class="bi">print</span>(<span class="var">materias</span>[-<span class="num">1</span>])                <span class="cm"># último elemento</span>
+<span class="bi">print</span>(<span class="var">materias</span>[<span class="num">1</span>:<span class="num">3</span>])               <span class="cm"># slicing [inicio:fin]</span>
+<span class="bi">print</span>(<span class="bi">len</span>(<span class="var">materias</span>))               <span class="cm"># longitud</span>
+
+<span class="cm"># ===== TUPLE — inmutable, ordenada =====</span>
+<span class="var">coordenadas</span> = (<span class="num">16.7569</span>, <span class="op">-</span><span class="num">93.1292</span>)  <span class="cm"># Tuxtla Gutiérrez</span>
+<span class="var">lat</span>, <span class="var">lon</span> = <span class="var">coordenadas</span>              <span class="cm"># desempaquetado</span>
+<span class="cm"># coordenadas[0] = 0  # ← Error! tuplas son inmutables</span>
+
+<span class="cm"># ===== DICT — mutable, pares clave:valor =====</span>
+<span class="var">estudiante</span> = {
+    <span class="str">"nombre"</span><span class="op">:</span> <span class="str">"Ana García"</span>,
+    <span class="str">"semestre"</span><span class="op">:</span> <span class="num">2</span>,
+    <span class="str">"materia"</span><span class="op">:</span> <span class="str">"Cultura Digital"</span>,
+    <span class="str">"activo"</span><span class="op">:</span> <span class="bool">True</span>
+}
+<span class="bi">print</span>(<span class="var">estudiante</span>[<span class="str">"nombre"</span>])         <span class="cm"># acceso por clave</span>
+<span class="var">estudiante</span>[<span class="str">"nota"</span>] = <span class="num">9.5</span>           <span class="cm"># agregar/modificar</span>
+<span class="var">estudiante</span>.<span class="fn">get</span>(<span class="str">"edad"</span>, <span class="str">"N/A"</span>)      <span class="cm"># valor por defecto</span>
+<span class="kw">for</span> <span class="var">clave</span>, <span class="var">valor</span> <span class="kw">in</span> <span class="var">estudiante</span>.<span class="fn">items</span>()<span class="op">:</span>
+    <span class="bi">print</span>(<span class="str">f"  </span><span class="op">{</span><span class="var">clave</span><span class="op">}</span><span class="str">: </span><span class="op">{</span><span class="var">valor</span><span class="op">}</span><span class="str">"</span>)
+
+<span class="cm"># ===== SET — sin duplicados, no ordenado =====</span>
+<span class="var">tecnologias</span> = {<span class="str">"HTML"</span>, <span class="str">"CSS"</span>, <span class="str">"Python"</span>, <span class="str">"HTML"</span>}
+<span class="cm"># → {"HTML", "CSS", "Python"}  (elimina duplicado)</span>
+<span class="var">tecnologias</span>.<span class="fn">add</span>(<span class="str">"JavaScript"</span>)
+<span class="var">a</span> = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};  <span class="var">b</span> = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+<span class="bi">print</span>(<span class="var">a</span> & <span class="var">b</span>)   <span class="cm"># {2, 3} → intersección</span>
+<span class="bi">print</span>(<span class="var">a</span> | <span class="var">b</span>)   <span class="cm"># {1,2,3,4} → unión</span>
+<span class="bi">print</span>(<span class="var">a</span> - <span class="var">b</span>)   <span class="cm"># {1} → diferencia</span></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Sintaxis</th><th>Ordenada</th><th>Duplicados</th><th>Mutable</th></tr></thead>
+        <tbody>
+          <tr><td>list</td><td>[1, 2, 3]</td><td>✅ Sí</td><td>✅ Sí</td><td><span class="tbadge tb-mutable">mutable</span></td></tr>
+          <tr><td>tuple</td><td>(1, 2, 3)</td><td>✅ Sí</td><td>✅ Sí</td><td><span class="tbadge tb-immutable">inmutable</span></td></tr>
+          <tr><td>dict</td><td>{"k": "v"}</td><td>✅ (3.7+)</td><td>❌ Claves únicas</td><td><span class="tbadge tb-mutable">mutable</span></td></tr>
+          <tr><td>set</td><td>{1, 2, 3}</td><td>❌ No</td><td>❌ No</td><td><span class="tbadge tb-mutable">mutable</span></td></tr>
+          <tr><td>frozenset</td><td>frozenset({1,2})</td><td>❌ No</td><td>❌ No</td><td><span class="tbadge tb-immutable">inmutable</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 7: FUNCIONES ======= -->
+  <section class="guide-section sec-anchor" id="mod7">
+    <div class="sec-head">
+      <div class="sec-num n7">07</div>
+      <div class="sec-titles">
+        <div class="sec-title">Funciones</div>
+        <div class="sec-sub">Reutilización de código: definición, parámetros, retorno y lambdas</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Las <strong>funciones</strong> son bloques de código reutilizables que realizan una tarea específica. Se definen con la palabra clave <code>def</code> y se invocan con su nombre seguido de paréntesis. Son fundamentales para organizar programas grandes y evitar la repetición de código (principio <strong>DRY</strong>: Don't Repeat Yourself).</p>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">funciones.py</span>
+        <span class="code-tag">FUNCIONES</span>
+      </div>
+      <pre><span class="cm"># ===== FUNCIÓN BÁSICA =====</span>
+<span class="kw">def</span> <span class="fn">saludar</span>(<span class="var">nombre</span>)<span class="op">:</span>
+    <span class="str">"""Docstring: describe qué hace la función."""</span>
+    <span class="kw">return</span> <span class="str">f"¡Hola, </span><span class="op">{</span><span class="var">nombre</span><span class="op">}</span><span class="str">!"</span>
+
+<span class="bi">print</span>(<span class="fn">saludar</span>(<span class="str">"Cultura Digital"</span>))  <span class="cm"># → ¡Hola, Cultura Digital!</span>
+
+<span class="cm"># ===== PARÁMETROS CON VALOR POR DEFECTO =====</span>
+<span class="kw">def</span> <span class="fn">potencia</span>(<span class="var">base</span>, <span class="var">exponente</span>=<span class="num">2</span>)<span class="op">:</span>
+    <span class="kw">return</span> <span class="var">base</span> ** <span class="var">exponente</span>
+
+<span class="bi">print</span>(<span class="fn">potencia</span>(<span class="num">5</span>))       <span class="cm"># → 25 (usa exponente=2)</span>
+<span class="bi">print</span>(<span class="fn">potencia</span>(<span class="num">2</span>, <span class="num">10</span>))   <span class="cm"># → 1024</span>
+
+<span class="cm"># ===== *args y **kwargs: cantidad variable de argumentos =====</span>
+<span class="kw">def</span> <span class="fn">sumar</span>(*<span class="var">numeros</span>)<span class="op">:</span>            <span class="cm"># *args → tupla</span>
+    <span class="kw">return</span> <span class="bi">sum</span>(<span class="var">numeros</span>)
+
+<span class="bi">print</span>(<span class="fn">sumar</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>))   <span class="cm"># → 15</span>
+
+<span class="kw">def</span> <span class="fn">info_persona</span>(**<span class="var">datos</span>)<span class="op">:</span>      <span class="cm"># **kwargs → dict</span>
+    <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">datos</span>.<span class="fn">items</span>()<span class="op">:</span>
+        <span class="bi">print</span>(<span class="str">f"  </span><span class="op">{</span><span class="var">k</span><span class="op">}</span><span class="str">: </span><span class="op">{</span><span class="var">v</span><span class="op">}</span><span class="str">"</span>)
+
+<span class="fn">info_persona</span>(<span class="var">nombre</span>=<span class="str">"Ana"</span>, <span class="var">edad</span>=<span class="num">17</span>, <span class="var">semestre</span>=<span class="num">2</span>)
+
+<span class="cm"># ===== MÚLTIPLES VALORES DE RETORNO =====</span>
+<span class="kw">def</span> <span class="fn">estadisticas</span>(<span class="var">nums</span>)<span class="op">:</span>
+    <span class="kw">return</span> <span class="bi">min</span>(<span class="var">nums</span>), <span class="bi">max</span>(<span class="var">nums</span>), <span class="bi">sum</span>(<span class="var">nums</span>) / <span class="bi">len</span>(<span class="var">nums</span>)
+
+<span class="var">minimo</span>, <span class="var">maximo</span>, <span class="var">promedio</span> = <span class="fn">estadisticas</span>([<span class="num">5</span>,<span class="num">3</span>,<span class="num">8</span>,<span class="num">1</span>,<span class="num">9</span>])
+<span class="bi">print</span>(<span class="var">minimo</span>, <span class="var">maximo</span>, <span class="var">promedio</span>)  <span class="cm"># → 1  9  5.2</span>
+
+<span class="cm"># ===== FUNCIÓN LAMBDA (anónima, en una línea) =====</span>
+<span class="var">cuadrado</span>  = <span class="kw">lambda</span> <span class="var">x</span><span class="op">:</span> <span class="var">x</span>**<span class="num">2</span>
+<span class="var">es_par</span>    = <span class="kw">lambda</span> <span class="var">n</span><span class="op">:</span> <span class="var">n</span> % <span class="num">2</span> == <span class="num">0</span>
+<span class="var">ordenados</span> = <span class="bi">sorted</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>], <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">x</span><span class="op">:</span> -<span class="var">x</span>) <span class="cm"># descendente</span>
+
+<span class="cm"># ===== FUNCIONES DE ORDEN SUPERIOR =====</span>
+<span class="var">nums</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>]
+<span class="var">pares</span>     = <span class="bi">list</span>(<span class="bi">filter</span>(<span class="kw">lambda</span> <span class="var">n</span><span class="op">:</span> <span class="var">n</span>%<span class="num">2</span>==<span class="num">0</span>, <span class="var">nums</span>))  <span class="cm"># [2,4,6]</span>
+<span class="var">dobles</span>    = <span class="bi">list</span>(<span class="bi">map</span>(<span class="kw">lambda</span> <span class="var">n</span><span class="op">:</span> <span class="var">n</span>*<span class="num">2</span>, <span class="var">nums</span>))         <span class="cm"># [2,4,6,8,10,12]</span></pre>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 8: POO ======= -->
+  <section class="guide-section sec-anchor" id="mod8">
+    <div class="sec-head">
+      <div class="sec-num n8">08</div>
+      <div class="sec-titles">
+        <div class="sec-title">Programación Orientada a Objetos</div>
+        <div class="sec-sub">Clases, objetos, herencia, encapsulamiento y polimorfismo</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>La <strong>Programación Orientada a Objetos (POO)</strong> es un paradigma que organiza el código en <em>objetos</em>, que combinan datos (atributos) y comportamiento (métodos). Python es un lenguaje orientado a objetos de pura cepa: incluso los tipos básicos como <code>int</code> y <code>str</code> son objetos. Los cuatro pilares de la POO son: <strong>Encapsulamiento, Herencia, Polimorfismo y Abstracción</strong>.</p>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">poo.py</span>
+        <span class="code-tag">POO</span>
+      </div>
+      <pre><span class="cm"># ===== CLASE BASE =====</span>
+<span class="kw">class</span> <span class="cls">Persona</span><span class="op">:</span>
+    <span class="cm">"""Clase que representa a una persona."""</span>
+
+    <span class="cm"># Atributo de clase (compartido por todos)</span>
+    <span class="var">especie</span> = <span class="str">"Homo sapiens"</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">nombre</span>, <span class="var">edad</span>)<span class="op">:</span>
+        <span class="cm"># Atributos de instancia</span>
+        <span class="var">self</span>.<span class="var">nombre</span> = <span class="var">nombre</span>     <span class="cm"># público</span>
+        <span class="var">self</span>.<span class="var">edad</span>   = <span class="var">edad</span>
+        <span class="var">self</span>.<span class="var">_email</span> = <span class="bool">None</span>      <span class="cm"># _  = convención "privado"</span>
+
+    <span class="kw">def</span> <span class="fn">presentarse</span>(<span class="var">self</span>)<span class="op">:</span>
+        <span class="kw">return</span> <span class="str">f"Hola, soy </span><span class="op">{</span><span class="var">self</span>.<span class="var">nombre</span><span class="op">}</span><span class="str"> y tengo </span><span class="op">{</span><span class="var">self</span>.<span class="var">edad</span><span class="op">}</span><span class="str"> años."</span>
+
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="var">self</span>)<span class="op">:</span>         <span class="cm"># representación del objeto</span>
+        <span class="kw">return</span> <span class="str">f"Persona('{self.nombre}', {self.edad})"</span>
+
+
+<span class="cm"># ===== HERENCIA =====</span>
+<span class="kw">class</span> <span class="cls">Estudiante</span>(<span class="cls">Persona</span>)<span class="op">:</span>     <span class="cm"># hereda de Persona</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">nombre</span>, <span class="var">edad</span>, <span class="var">matricula</span>)<span class="op">:</span>
+        <span class="bi">super</span>().<span class="fn">__init__</span>(<span class="var">nombre</span>, <span class="var">edad</span>)  <span class="cm"># llama al padre</span>
+        <span class="var">self</span>.<span class="var">matricula</span> = <span class="var">matricula</span>
+        <span class="var">self</span>.<span class="var">materias</span>  = []
+
+    <span class="kw">def</span> <span class="fn">inscribir</span>(<span class="var">self</span>, <span class="var">materia</span>)<span class="op">:</span>
+        <span class="var">self</span>.<span class="var">materias</span>.<span class="fn">append</span>(<span class="var">materia</span>)
+
+    <span class="kw">def</span> <span class="fn">presentarse</span>(<span class="var">self</span>)<span class="op">:</span>     <span class="cm"># polimorfismo: sobreescribe el método</span>
+        <span class="var">base</span> = <span class="bi">super</span>().<span class="fn">presentarse</span>()
+        <span class="kw">return</span> <span class="str">f"</span><span class="op">{</span><span class="var">base</span><span class="op">}</span><span class="str"> Matrícula: </span><span class="op">{</span><span class="var">self</span>.<span class="var">matricula</span><span class="op">}</span><span class="str">"</span>
+
+
+<span class="cm"># ===== USO =====</span>
+<span class="var">ana</span> = <span class="cls">Estudiante</span>(<span class="str">"Ana"</span>, <span class="num">17</span>, <span class="str">"2024-001"</span>)
+<span class="var">ana</span>.<span class="fn">inscribir</span>(<span class="str">"Cultura Digital"</span>)
+<span class="var">ana</span>.<span class="fn">inscribir</span>(<span class="str">"Python"</span>)
+<span class="bi">print</span>(<span class="var">ana</span>.<span class="fn">presentarse</span>())
+<span class="bi">print</span>(<span class="var">ana</span>.<span class="var">materias</span>)
+<span class="bi">print</span>(<span class="bi">isinstance</span>(<span class="var">ana</span>, <span class="cls">Persona</span>))    <span class="cm"># → True</span>
+<span class="bi">print</span>(<span class="bi">isinstance</span>(<span class="var">ana</span>, <span class="cls">Estudiante</span>))  <span class="cm"># → True</span></pre>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-title">✅ Los 4 Pilares de la POO</div>
+        <div class="code-wrap" style="margin-bottom:0;">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">pilares.py</span></div>
+          <pre style="font-size:.74rem;"><span class="cm"># ENCAPSULAMIENTO</span>
+<span class="cm"># Ocultar detalles internos</span>
+<span class="var">self</span>.<span class="var">_saldo</span> = <span class="num">0</span>  <span class="cm"># convención privado</span>
+
+<span class="cm"># HERENCIA</span>
+<span class="cm"># Reusar código del padre</span>
+<span class="kw">class</span> <span class="cls">Animal</span><span class="op">:</span> ...
+<span class="kw">class</span> <span class="cls">Perro</span>(<span class="cls">Animal</span>)<span class="op">:</span> ...
+
+<span class="cm"># POLIMORFISMO</span>
+<span class="cm"># Mismo método, distinto comportamiento</span>
+<span class="kw">def</span> <span class="fn">hablar</span>(<span class="var">self</span>)<span class="op">:</span>
+    <span class="kw">return</span> <span class="str">"Guau"</span>   <span class="cm"># en Perro</span>
+    <span class="kw">return</span> <span class="str">"Miau"</span>   <span class="cm"># en Gato</span>
+
+<span class="cm"># ABSTRACCIÓN</span>
+<span class="cm"># Ocultar complejidad</span>
+<span class="var">ana</span>.<span class="fn">inscribir</span>(<span class="str">"Python"</span>)
+<span class="cm"># ↑ No sabemos cómo funciona por dentro</span></pre>
+        </div>
+      </div>
+      <div class="compare-card bad">
+        <div class="compare-title">❌ Sin POO (código repetido)</div>
+        <div class="code-wrap" style="margin-bottom:0;">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">sin_poo.py</span></div>
+          <pre style="font-size:.74rem;"><span class="cm"># Código sin estructura</span>
+<span class="cm"># Se repite para cada "persona"</span>
+
+<span class="var">nombre1</span> = <span class="str">"Ana"</span>
+<span class="var">edad1</span>   = <span class="num">17</span>
+<span class="var">mat1</span>    = []
+
+<span class="var">nombre2</span> = <span class="str">"Luis"</span>
+<span class="var">edad2</span>   = <span class="num">18</span>
+<span class="var">mat2</span>    = []
+
+<span class="cm"># Duplicación, difícil de mantener,</span>
+<span class="cm"># imposible de escalar...</span>
+<span class="cm"># ↑ Esto es lo que POO resuelve.</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= MÓDULO 9: MÓDULOS Y ECOSISTEMA ======= -->
+  <section class="guide-section sec-anchor" id="mod9">
+    <div class="sec-head">
+      <div class="sec-num n9">09</div>
+      <div class="sec-titles">
+        <div class="sec-title">Módulos, Paquetes y Ecosistema</div>
+        <div class="sec-sub">Importaciones, manejo de errores y las librerías más importantes</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">modulos_errores.py</span>
+        <span class="code-tag">MÓDULOS</span>
+      </div>
+      <pre><span class="cm"># ===== IMPORTAR MÓDULOS =====</span>
+<span class="kw">import</span> <span class="var">math</span>                          <span class="cm"># módulo completo</span>
+<span class="kw">from</span> <span class="var">math</span> <span class="kw">import</span> <span class="fn">sqrt</span>, <span class="fn">pi</span>           <span class="cm"># partes específicas</span>
+<span class="kw">import</span> <span class="var">random</span> <span class="kw">as</span> <span class="var">rd</span>                 <span class="cm"># alias</span>
+<span class="kw">from</span> <span class="var">datetime</span> <span class="kw">import</span> <span class="cls">datetime</span>
+
+<span class="bi">print</span>(<span class="var">math</span>.<span class="fn">sqrt</span>(<span class="num">144</span>))               <span class="cm"># → 12.0</span>
+<span class="bi">print</span>(<span class="fn">sqrt</span>(<span class="num">144</span>))                    <span class="cm"># → 12.0</span>
+<span class="bi">print</span>(<span class="fn">pi</span>)                           <span class="cm"># → 3.141592653589793</span>
+<span class="bi">print</span>(<span class="var">rd</span>.<span class="fn">randint</span>(<span class="num">1</span>, <span class="num">100</span>))           <span class="cm"># número aleatorio</span>
+<span class="bi">print</span>(<span class="cls">datetime</span>.<span class="fn">now</span>())               <span class="cm"># fecha y hora actual</span>
+
+<span class="cm"># ===== MANEJO DE EXCEPCIONES =====</span>
+<span class="kw">def</span> <span class="fn">dividir</span>(<span class="var">a</span>, <span class="var">b</span>)<span class="op">:</span>
+    <span class="kw">try</span><span class="op">:</span>
+        <span class="var">resultado</span> = <span class="var">a</span> / <span class="var">b</span>
+    <span class="kw">except</span> <span class="cls">ZeroDivisionError</span><span class="op">:</span>
+        <span class="bi">print</span>(<span class="str">"Error: no se puede dividir entre 0"</span>)
+        <span class="kw">return</span> <span class="bool">None</span>
+    <span class="kw">except</span> <span class="cls">TypeError</span> <span class="kw">as</span> <span class="var">e</span><span class="op">:</span>
+        <span class="bi">print</span>(<span class="str">f"Error de tipo: </span><span class="op">{</span><span class="var">e</span><span class="op">}</span><span class="str">"</span>)
+        <span class="kw">return</span> <span class="bool">None</span>
+    <span class="kw">else</span><span class="op">:</span>
+        <span class="bi">print</span>(<span class="str">"División exitosa"</span>)    <span class="cm"># si NO hay excepción</span>
+        <span class="kw">return</span> <span class="var">resultado</span>
+    <span class="kw">finally</span><span class="op">:</span>
+        <span class="bi">print</span>(<span class="str">"Esto siempre se ejecuta"</span>)  <span class="cm"># siempre</span>
+
+<span class="cm"># ===== ARCHIVOS =====</span>
+<span class="cm"># Escribir un archivo</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"datos.txt"</span>, <span class="str">"w"</span>, <span class="var">encoding</span>=<span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span><span class="op">:</span>
+    <span class="var">f</span>.<span class="fn">write</span>(<span class="str">"Cultura Digital 2\n"</span>)
+
+<span class="cm"># Leer un archivo</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"datos.txt"</span>, <span class="str">"r"</span>, <span class="var">encoding</span>=<span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span><span class="op">:</span>
+    <span class="var">contenido</span> = <span class="var">f</span>.<span class="fn">read</span>()
+    <span class="bi">print</span>(<span class="var">contenido</span>)</pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Librería</th><th>Área</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>NumPy</td><td>🔢 Matemáticas</td><td>Arrays multidimensionales y álgebra lineal de alto rendimiento.</td></tr>
+          <tr><td>Pandas</td><td>📊 Data Science</td><td>Análisis y manipulación de datos con DataFrames. Esencial para datos tabulares.</td></tr>
+          <tr><td>Matplotlib / Seaborn</td><td>📈 Visualización</td><td>Crear gráficas, histogramas, mapas de calor y visualizaciones de datos.</td></tr>
+          <tr><td>Scikit-learn</td><td>🤖 Machine Learning</td><td>Algoritmos de ML: clasificación, regresión, clustering, reducción dimensional.</td></tr>
+          <tr><td>TensorFlow / PyTorch</td><td>🧠 Deep Learning</td><td>Redes neuronales y aprendizaje profundo a gran escala.</td></tr>
+          <tr><td>Flask / Django</td><td>🌐 Web Backend</td><td>Frameworks para crear APIs REST y aplicaciones web con Python.</td></tr>
+          <tr><td>Requests</td><td>🔗 HTTP</td><td>Hacer peticiones HTTP de forma sencilla: consumir APIs, scraping.</td></tr>
+          <tr><td>Pygame</td><td>🎮 Videojuegos</td><td>Crear videojuegos 2D con Python de forma accesible.</td></tr>
+          <tr><td>Tkinter</td><td>🪟 GUI</td><td>Crear interfaces gráficas de escritorio (incluida en la librería estándar).</td></tr>
+          <tr><td>OpenCV</td><td>👁️ Visión artificial</td><td>Procesamiento de imágenes y visión por computadora en tiempo real.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box ib-warn">
+      <span class="info-box-icon">📦</span>
+      <div class="info-box-text"><strong>pip: el gestor de paquetes de Python.</strong> Instala librerías de terceros con: <code>pip install nombre_libreria</code>. Por ejemplo: <code>pip install pandas</code>, <code>pip install flask</code>. Los entornos virtuales (<code>python -m venv nombre</code>) permiten aislar dependencias por proyecto, evitando conflictos.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Conclusión -->
+  <div class="conclusion">
+    <h3>🎓 ¿Qué aprendiste?</h3>
+    <p>Recorriste los <strong>9 conceptos generales de Python</strong>: su historia con Guido van Rossum, sus características únicas, los tipos de datos, operadores, estructuras de control, colecciones (listas, tuplas, diccionarios, sets), funciones con lambdas, la Programación Orientada a Objetos con sus 4 pilares, y el ecosistema de módulos y librerías.</p>
+    <p>Python es el puente perfecto entre el aprendizaje de programación y la Inteligencia Artificial. Todo lo que viste aquí es la base para usar librerías como <strong>NumPy, Pandas, Scikit-learn y TensorFlow</strong>, que son las herramientas con las que se construye la IA moderna. El camino recién empieza. 🦦🐍</p>
+  </div>
+
+</main>
+
+<footer class="task-footer">
+  <p>🦦 <span>Tarea 06</span> · Conceptos Generales de Python · Portafolio de Cultura Digital 2 · 2° Semestre de IA</p>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+</script>
+</body>
+</html>
