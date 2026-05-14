@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tarea 07 — Componentes de Arduino | Cultura Digital 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --azul-pastel:    #b8d8f0;
+      --amarillo-pastel:#fce9a2;
+      --celeste-pastel: #c7eff8;
+      --blanco:         #ffffff;
+      --azul-medio:     #7ab8e0;
+      --azul-oscuro:    #3a7bbf;
+      --texto-oscuro:   #2c4a6e;
+      --sombra:         rgba(58,123,191,0.15);
+      --bg:             #edf6ff;
+      --code-bg:        #1a2535;
+      --code-top:       #111e2c;
+      /* Arduino brand */
+      --ard-teal:       #00878A;
+      --ard-dark:       #005C5F;
+      --ard-light:      #62AEB2;
+      --ard-orange:     #E47128;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body{ font-family:'Nunito',sans-serif; background:var(--bg); color:var(--texto-oscuro); overflow-x:hidden; }
+
+    /* PROGRESS BAR */
+    .progress-bar{
+      position:fixed; top:0; left:0; height:4px; z-index:500;
+      background:linear-gradient(90deg, var(--ard-teal), var(--ard-light), var(--amarillo-pastel));
+      width:0%; transition:width .1s; border-radius:0 4px 4px 0;
+      box-shadow:0 0 12px rgba(0,135,138,.5);
+    }
+
+    /* BACK BUTTON */
+    .back-btn{
+      position:fixed; top:22px; left:22px; z-index:300;
+      display:flex; align-items:center; gap:8px;
+      background:var(--blanco); color:var(--azul-oscuro);
+      font-family:'Nunito',sans-serif; font-weight:700; font-size:.88rem;
+      padding:10px 20px 10px 14px; border-radius:30px;
+      box-shadow:0 4px 18px var(--sombra); text-decoration:none;
+      border:2px solid var(--azul-pastel); transition:all .25s;
+    }
+    .back-btn:hover{ background:var(--azul-oscuro); color:var(--blanco); border-color:var(--azul-oscuro); transform:translateX(-4px); }
+    .back-btn svg{ width:16px; height:16px; transition:transform .25s; }
+    .back-btn:hover svg{ transform:translateX(-3px); }
+
+    /* ======= HERO ======= */
+    .hero{
+      min-height:100vh;
+      background:linear-gradient(150deg, #003638 0%, #005C5F 35%, #00878A 70%, #62AEB2 100%);
+      position:relative; display:flex; align-items:center;
+      justify-content:center; overflow:hidden; padding:100px 30px 80px;
+    }
+
+    /* Circuito PCB de fondo */
+    .pcb-bg{
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+    .pcb-bg svg{ width:100%; height:100%; opacity:.06; }
+
+    /* Íconos de componentes flotantes */
+    .comp-float{
+      position:absolute; font-size:1.6rem;
+      opacity:.18; animation:compDrift 9s ease-in-out infinite;
+      pointer-events:none;
+    }
+    .comp-float:nth-child(1){ top:8%;  left:5%;  animation-delay:0s;   font-size:2rem; }
+    .comp-float:nth-child(2){ top:20%; right:6%; animation-delay:1.5s; }
+    .comp-float:nth-child(3){ top:38%; left:3%;  animation-delay:3s;   font-size:2.2rem; }
+    .comp-float:nth-child(4){ top:55%; right:4%; animation-delay:.8s;  font-size:1.8rem; }
+    .comp-float:nth-child(5){ top:70%; left:7%;  animation-delay:2.5s; }
+    .comp-float:nth-child(6){ top:83%; right:7%; animation-delay:4s;   font-size:2rem; }
+    .comp-float:nth-child(7){ top:28%; left:42%; animation-delay:1s;   font-size:1.4rem; }
+    .comp-float:nth-child(8){ top:62%; left:38%; animation-delay:3.2s; font-size:1.5rem; }
+    @keyframes compDrift{
+      0%,100%{ transform:translateY(0) rotate(-3deg); }
+      50%    { transform:translateY(-20px) rotate(3deg); }
+    }
+
+    /* Orbes */
+    .hero-orb{
+      position:absolute; border-radius:50%; pointer-events:none;
+      animation:orbPulse 8s ease-in-out infinite;
+    }
+    .hero-orb:nth-child(1){ width:450px;height:450px; background:radial-gradient(circle,rgba(0,135,138,.3),transparent 70%); top:-120px;right:-120px; animation-delay:0s; }
+    .hero-orb:nth-child(2){ width:280px;height:280px; background:radial-gradient(circle,rgba(228,113,40,.12),transparent 70%); bottom:3%;left:-90px; animation-delay:2.5s; }
+    .hero-orb:nth-child(3){ width:160px;height:160px; background:radial-gradient(circle,rgba(184,216,240,.18),transparent 70%); top:35%;right:16%; animation-delay:5s; }
+    @keyframes orbPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+
+    .task-chip{
+      position:absolute; top:28px; right:28px;
+      background:var(--amarillo-pastel); color:#003638;
+      font-weight:800; font-size:.78rem; letter-spacing:1.5px;
+      padding:6px 16px; border-radius:20px; text-transform:uppercase;
+    }
+
+    .hero-inner{
+      position:relative; z-index:5;
+      display:flex; flex-direction:column;
+      align-items:center; text-align:center; gap:20px; max-width:840px;
+    }
+
+    /* Arduino board SVG animada */
+    .board-wrap{
+      animation:boardFloat 3.5s ease-in-out infinite;
+      filter:drop-shadow(0 14px 44px rgba(0,135,138,.8));
+    }
+    @keyframes boardFloat{
+      0%,100%{ transform:translateY(0) rotate(-1.5deg); }
+      50%    { transform:translateY(-14px) rotate(1.5deg); }
+    }
+
+    .mod-badges{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+    .mbadge{
+      background:rgba(255,255,255,.11); backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.22); color:var(--blanco);
+      font-family:'Fira Code',monospace; font-size:.76rem; padding:6px 14px;
+      border-radius:12px; animation:badgePop .5s ease both;
+    }
+    .mbadge:nth-child(1){ animation-delay:.1s; } .mbadge:nth-child(2){ animation-delay:.2s; }
+    .mbadge:nth-child(3){ animation-delay:.3s; } .mbadge:nth-child(4){ animation-delay:.4s; }
+    .mbadge:nth-child(5){ animation-delay:.5s; } .mbadge:nth-child(6){ animation-delay:.6s; }
+    @keyframes badgePop{
+      from{ opacity:0; transform:scale(.7) translateY(8px); }
+      to  { opacity:1; transform:scale(1)  translateY(0); }
+    }
+
+    .hero-tag{
+      background:rgba(255,255,255,.12); backdrop-filter:blur(8px);
+      color:var(--amarillo-pastel); font-size:.78rem; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:5px 18px; border-radius:20px;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .hero-title{
+      font-family:'Baloo 2',cursive; font-size:clamp(2.2rem,5.5vw,4rem);
+      font-weight:800; color:var(--blanco); line-height:1.08;
+      text-shadow:0 4px 30px rgba(0,0,0,.4);
+    }
+    .hero-title .acc { color:#7dd8da; }
+    .hero-title .acc2{ color:var(--amarillo-pastel); }
+    .hero-sub{ font-size:1rem; color:rgba(255,255,255,.82); max-width:580px; line-height:1.7; }
+    .hero-stats{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+    .stat-pill{
+      background:rgba(255,255,255,.13); backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.2); color:var(--blanco);
+      font-size:.82rem; font-weight:700; padding:8px 18px; border-radius:20px;
+    }
+
+    .toc-nav{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:8px; }
+    .toc-link{
+      background:rgba(0,92,95,.4); backdrop-filter:blur(6px);
+      border:1px solid rgba(98,174,178,.4); color:#7dd8da;
+      font-size:.76rem; font-weight:700; padding:5px 13px; border-radius:20px;
+      text-decoration:none; transition:all .2s;
+    }
+    .toc-link:hover{ background:rgba(0,92,95,.7); color:var(--blanco); }
+
+    .wave-hero{ position:absolute; bottom:0; left:0; width:100%; line-height:0; }
+
+    /* ======= CONTENIDO ======= */
+    .content{ max-width:1020px; margin:0 auto; padding:60px 28px 80px; }
+    .guide-section{ margin-bottom:68px; }
+    .sec-anchor{ scroll-margin-top:80px; }
+
+    /* Sección header */
+    .sec-head{ display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+    .sec-num{
+      width:54px; height:54px; border-radius:14px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Baloo 2',cursive; font-size:1.25rem; font-weight:800;
+      color:var(--blanco); box-shadow:0 4px 18px var(--sombra);
+    }
+    .n-ard  { background:linear-gradient(135deg,var(--ard-dark),var(--ard-teal));  box-shadow:0 4px 18px rgba(0,135,138,.4); }
+    .n-yel  { background:linear-gradient(135deg,#c47a00,#e6b800); box-shadow:0 4px 18px rgba(196,122,0,.35); }
+    .n-grn  { background:linear-gradient(135deg,#047857,#10b981); box-shadow:0 4px 18px rgba(4,120,87,.35); }
+    .n-pur  { background:linear-gradient(135deg,#5b21b6,#7c3aed); box-shadow:0 4px 18px rgba(91,33,182,.35); }
+    .n-org  { background:linear-gradient(135deg,#c2410c,#ea580c); box-shadow:0 4px 18px rgba(194,65,12,.35); }
+    .n-blu  { background:linear-gradient(135deg,var(--azul-oscuro),var(--azul-medio)); box-shadow:0 4px 18px var(--sombra); }
+    .n-rose { background:linear-gradient(135deg,#9d174d,#ec4899); box-shadow:0 4px 18px rgba(157,23,77,.35); }
+    .n-sky  { background:linear-gradient(135deg,#0369a1,#38bdf8); box-shadow:0 4px 18px rgba(3,105,161,.35); }
+    .n-dark { background:linear-gradient(135deg,var(--texto-oscuro),var(--azul-oscuro)); box-shadow:0 4px 18px var(--sombra); }
+
+    .sec-titles .sec-title{ font-family:'Baloo 2',cursive; font-size:1.6rem; font-weight:800; color:var(--texto-oscuro); line-height:1.2; }
+    .sec-titles .sec-sub  { font-size:.88rem; color:var(--ard-teal); font-weight:600; margin-top:2px; }
+
+    /* Prosa */
+    .prose{
+      font-size:.97rem; line-height:1.84; color:#476a8a;
+      background:var(--blanco); border-radius:18px;
+      padding:24px 28px; box-shadow:0 4px 20px var(--sombra); margin-bottom:20px;
+    }
+    .prose p{ margin-bottom:12px; } .prose p:last-child{ margin-bottom:0; }
+    .prose strong{ color:var(--texto-oscuro); }
+    .prose code{
+      font-family:'Fira Code',monospace; font-size:.84em;
+      background:#e0f4f4; color:var(--ard-dark);
+      padding:2px 7px; border-radius:6px;
+    }
+
+    /* Info boxes */
+    .info-box{
+      border-radius:18px; padding:18px 22px; margin-bottom:20px;
+      display:flex; gap:14px; align-items:flex-start;
+    }
+    .ib-tip  { background:#e8f7f0; border-left:5px solid #059669; }
+    .ib-warn { background:#fff8e1; border-left:5px solid #d97706; }
+    .ib-note { background:#e0f4f4; border-left:5px solid var(--ard-teal); }
+    .ib-spec { background:#f3e8ff; border-left:5px solid #7c3aed; }
+    .info-box-icon{ font-size:1.4rem; flex-shrink:0; margin-top:2px; }
+    .info-box-text{ font-size:.91rem; line-height:1.7; color:#476a8a; }
+    .info-box-text strong{ color:var(--texto-oscuro); }
+    .info-box-text code{
+      font-family:'Fira Code',monospace; font-size:.83em;
+      background:rgba(0,135,138,.1); color:var(--ard-dark);
+      padding:1px 6px; border-radius:5px;
+    }
+
+    /* Code blocks */
+    .code-wrap{ margin-bottom:22px; border-radius:14px; overflow:hidden; box-shadow:0 6px 24px rgba(0,0,0,.2); }
+    .code-header{
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--code-top); padding:10px 18px;
+    }
+    .code-dots{ display:flex; gap:6px; }
+    .cd{ width:11px; height:11px; border-radius:50%; }
+    .cd.r{ background:#ff5f57; } .cd.y{ background:#febc2e; } .cd.g{ background:#28c840; }
+    .code-label{ font-family:'Fira Code',monospace; font-size:.7rem; color:rgba(255,255,255,.35); letter-spacing:.5px; }
+    .code-tag{
+      font-size:.68rem; font-weight:700; padding:2px 10px;
+      border-radius:10px; letter-spacing:.5px; text-transform:uppercase;
+      background:rgba(0,135,138,.45); color:#7dd8da;
+    }
+    pre{
+      background:var(--code-bg); padding:20px 22px; overflow-x:auto;
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      line-height:1.8; color:#cdd9e5; margin:0;
+    }
+
+    /* Arduino / C++ syntax */
+    .kw  { color:#c792ea; font-weight:500; }
+    .fn  { color:#82aaff; }
+    .str { color:#c3e88d; }
+    .num { color:#f78c6c; }
+    .cm  { color:#546e7a; font-style:italic; }
+    .pp  { color:#ffcb6b; }   /* preprocessor */
+    .var { color:#eeffff; }
+    .con { color:#f07178; }   /* constants */
+    .op  { color:#89ddff; }
+
+    /* Tablas */
+    .table-wrap{
+      background:var(--blanco); border-radius:18px; overflow:hidden;
+      box-shadow:0 4px 20px var(--sombra); margin-bottom:22px; overflow-x:auto;
+    }
+    table{ width:100%; border-collapse:collapse; }
+    thead th{
+      background:linear-gradient(135deg,var(--ard-dark),var(--ard-teal));
+      color:var(--blanco); font-family:'Baloo 2',cursive; font-size:.88rem;
+      font-weight:700; padding:13px 18px; text-align:left;
+    }
+    tbody tr:nth-child(even){ background:#f0fafa; }
+    tbody tr:hover{ background:var(--celeste-pastel); transition:background .2s; }
+    tbody td{
+      padding:10px 18px; font-size:.86rem; color:#476a8a;
+      vertical-align:middle; border-bottom:1px solid #d8f0f0;
+    }
+    tbody td:first-child{
+      font-family:'Fira Code',monospace; font-size:.8rem;
+      color:var(--ard-teal); font-weight:700; white-space:nowrap;
+    }
+    .tbadge{
+      display:inline-block; font-size:.67rem; font-weight:700;
+      padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:.5px;
+    }
+    .tb-dig  { background:#e0f4f4; color:var(--ard-dark); }
+    .tb-ana  { background:#fef3c7; color:#92400e; }
+    .tb-pwr  { background:#fce7f3; color:#9d174d; }
+    .tb-com  { background:#ede9fe; color:#5b21b6; }
+    .tb-yes  { background:#dcfce7; color:#15803d; }
+    .tb-no   { background:#fee2e2; color:#991b1b; }
+    .tb-mid  { background:#fef9c3; color:#713f12; }
+
+    /* Componente cards — grandes */
+    .comp-section{
+      background:var(--blanco); border-radius:22px;
+      box-shadow:0 6px 28px var(--sombra);
+      overflow:hidden; margin-bottom:32px;
+      border-top:6px solid;
+      transition:transform .3s, box-shadow .3s;
+    }
+    .comp-section:hover{ transform:translateY(-4px); box-shadow:0 14px 40px var(--sombra); }
+
+    /* Colores por categoría */
+    .cs-micro  { border-color:var(--ard-teal); }
+    .cs-pin    { border-color:#3a7bbf; }
+    .cs-pwr    { border-color:#dc2626; }
+    .cs-sens   { border-color:#059669; }
+    .cs-act    { border-color:#d97706; }
+    .cs-com    { border-color:#7c3aed; }
+    .cs-disp   { border-color:#db2777; }
+    .cs-mem    { border-color:#0891b2; }
+    .cs-prot   { border-color:#374151; }
+
+    .comp-header{
+      display:flex; align-items:center; gap:16px;
+      padding:22px 26px 14px; border-bottom:1px solid #f0fafa;
+    }
+    .comp-icon{
+      width:64px; height:64px; border-radius:16px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.4rem; box-shadow:0 4px 14px rgba(0,0,0,.1);
+    }
+    .ci-teal  { background:linear-gradient(135deg,#e0f4f4,#b8e8e9); }
+    .ci-blue  { background:linear-gradient(135deg,var(--azul-pastel),var(--celeste-pastel)); }
+    .ci-red   { background:linear-gradient(135deg,#fee2e2,#fecaca); }
+    .ci-green { background:linear-gradient(135deg,#dcfce7,#bbf7d0); }
+    .ci-amber { background:linear-gradient(135deg,#fef3c7,#fde68a); }
+    .ci-purple{ background:linear-gradient(135deg,#ede9fe,#ddd6fe); }
+    .ci-pink  { background:linear-gradient(135deg,#fce7f3,#fbcfe8); }
+    .ci-sky   { background:linear-gradient(135deg,#e0f2fe,#bae6fd); }
+    .ci-dark  { background:linear-gradient(135deg,#f1f5f9,#e2e8f0); }
+
+    .comp-meta{ flex:1; }
+    .comp-name{ font-family:'Baloo 2',cursive; font-size:1.4rem; font-weight:800; color:var(--texto-oscuro); margin-bottom:3px; }
+    .comp-cat{ font-size:.78rem; font-weight:700; color:var(--ard-teal); text-transform:uppercase; letter-spacing:1.5px; }
+
+    .comp-body{ padding:20px 26px 24px; }
+
+    .comp-desc{ font-size:.95rem; line-height:1.78; color:#476a8a; margin-bottom:18px; }
+
+    /* Especificaciones */
+    .specs-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-bottom:20px; }
+    .spec-chip{
+      background:var(--bg); border-radius:12px; padding:10px 14px;
+      border:1px solid var(--azul-pastel); text-align:center;
+    }
+    .spec-label{ font-size:.65rem; font-weight:700; color:var(--azul-medio); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+    .spec-value{ font-family:'Fira Code',monospace; font-size:.82rem; font-weight:600; color:var(--texto-oscuro); }
+
+    /* Ventajas / Limitaciones */
+    .ven-lim-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+    @media(max-width:540px){ .ven-lim-grid{ grid-template-columns:1fr; } }
+
+    .ven-box, .lim-box{
+      border-radius:14px; padding:16px 18px;
+    }
+    .ven-box{ background:#e8f7f0; border-left:4px solid #10b981; }
+    .lim-box{ background:#fff8e1; border-left:4px solid #f59e0b; }
+    .vl-title{
+      font-family:'Baloo 2',cursive; font-size:.92rem; font-weight:800;
+      margin-bottom:10px;
+    }
+    .ven-box .vl-title{ color:#065f46; }
+    .lim-box .vl-title{ color:#92400e; }
+    .vl-list{ list-style:none; }
+    .vl-list li{ font-size:.84rem; color:#476a8a; line-height:1.6; margin-bottom:5px; display:flex; gap:7px; }
+    .vl-list li::before{ flex-shrink:0; margin-top:1px; }
+    .ven-box .vl-list li::before{ content:"✅"; font-size:.75rem; }
+    .lim-box .vl-list li::before{ content:"⚠️"; font-size:.75rem; }
+
+    /* Divider */
+    .divider{
+      height:3px; margin:10px 0 54px;
+      background:linear-gradient(90deg,transparent,var(--azul-pastel),var(--amarillo-pastel),transparent);
+      border-radius:4px;
+    }
+
+    /* PIN map visual */
+    .pin-visual{
+      background:var(--code-bg); border-radius:14px;
+      padding:18px 22px; margin-bottom:18px;
+      display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    }
+    .pin{
+      font-family:'Fira Code',monospace; font-size:.7rem; font-weight:600;
+      padding:6px 10px; border-radius:8px; text-align:center;
+      min-width:54px; line-height:1.3;
+    }
+    .pin-dig  { background:rgba(0,135,138,.35); color:#7dd8da; border:1px solid rgba(0,135,138,.4); }
+    .pin-ana  { background:rgba(230,184,0,.25); color:#fde68a; border:1px solid rgba(230,184,0,.35); }
+    .pin-pwr  { background:rgba(220,38,38,.3);  color:#fca5a5; border:1px solid rgba(220,38,38,.35); }
+    .pin-gnd  { background:rgba(55,65,81,.5);   color:#d1d5db; border:1px solid rgba(107,114,128,.4); }
+    .pin-pwm  { background:rgba(124,58,237,.35); color:#c4b5fd; border:1px solid rgba(124,58,237,.4); }
+    .pin-tx   { background:rgba(234,88,12,.35); color:#fed7aa; border:1px solid rgba(234,88,12,.4); }
+
+    /* Conclusión */
+    .conclusion{
+      background:linear-gradient(135deg,#003638,var(--ard-dark));
+      border-radius:22px; padding:36px 38px;
+      color:var(--blanco); position:relative; overflow:hidden;
+    }
+    .conclusion::before{ content:'⚡'; position:absolute; right:24px; bottom:16px; font-size:5rem; opacity:.1; }
+    .conclusion::after { content:'void loop() { }'; position:absolute; left:28px; top:16px; font-family:'Fira Code',monospace; font-size:.85rem; color:rgba(255,255,255,.07); }
+    .conclusion h3{ font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:var(--amarillo-pastel); margin-bottom:14px; }
+    .conclusion p{ font-size:.97rem; line-height:1.8; color:rgba(255,255,255,.85); margin-bottom:10px; }
+    .conclusion p:last-child{ margin-bottom:0; }
+
+    /* Footer */
+    .task-footer{ background:var(--texto-oscuro); color:rgba(255,255,255,.45); text-align:center; padding:24px 20px; font-size:.82rem; }
+    .task-footer span{ color:var(--amarillo-pastel); font-weight:700; }
+
+    @media(max-width:600px){
+      .content{ padding:40px 16px 60px; }
+      .comp-header{ flex-direction:column; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<a class="back-btn" href="index.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  Regresar al portafolio
+</a>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+
+  <!-- Circuito de fondo -->
+  <div class="pcb-bg">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1440" height="900" fill="none"/>
+      <!-- Trazas de circuito -->
+      <line x1="0" y1="200" x2="400" y2="200" stroke="white" stroke-width="2"/>
+      <line x1="400" y1="200" x2="400" y2="400" stroke="white" stroke-width="2"/>
+      <line x1="400" y1="400" x2="800" y2="400" stroke="white" stroke-width="2"/>
+      <line x1="800" y1="400" x2="800" y2="600" stroke="white" stroke-width="2"/>
+      <line x1="800" y1="600" x2="1440" y2="600" stroke="white" stroke-width="2"/>
+      <line x1="200" y1="0" x2="200" y2="300" stroke="white" stroke-width="2"/>
+      <line x1="200" y1="300" x2="600" y2="300" stroke="white" stroke-width="2"/>
+      <line x1="600" y1="300" x2="600" y2="700" stroke="white" stroke-width="2"/>
+      <line x1="600" y1="700" x2="1200" y2="700" stroke="white" stroke-width="2"/>
+      <line x1="1000" y1="0" x2="1000" y2="500" stroke="white" stroke-width="2"/>
+      <line x1="1000" y1="500" x2="1440" y2="500" stroke="white" stroke-width="2"/>
+      <!-- Pads de circuito -->
+      <circle cx="400" cy="200" r="6" fill="white"/> <circle cx="400" cy="400" r="6" fill="white"/>
+      <circle cx="800" cy="400" r="6" fill="white"/> <circle cx="800" cy="600" r="6" fill="white"/>
+      <circle cx="200" cy="300" r="6" fill="white"/> <circle cx="600" cy="300" r="6" fill="white"/>
+      <circle cx="600" cy="700" r="6" fill="white"/> <circle cx="1000" cy="500" r="6" fill="white"/>
+      <circle cx="1200" cy="700" r="6" fill="white"/>
+      <!-- Componentes del circuito -->
+      <rect x="340" y="380" width="40" height="20" rx="4" fill="white" opacity=".5"/>
+      <rect x="740" y="580" width="40" height="20" rx="4" fill="white" opacity=".5"/>
+      <rect x="170" y="280" width="20" height="40" rx="4" fill="white" opacity=".5"/>
+    </svg>
+  </div>
+
+  <!-- Componentes flotantes -->
+  <div class="comp-float">⚡</div>
+  <div class="comp-float">💡</div>
+  <div class="comp-float">🔌</div>
+  <div class="comp-float">🎛️</div>
+  <div class="comp-float">📡</div>
+  <div class="comp-float">🔋</div>
+  <div class="comp-float">🖥️</div>
+  <div class="comp-float">⚙️</div>
+
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+
+  <div class="task-chip">✦ Tarea 07</div>
+
+  <div class="hero-inner">
+
+    <!-- Arduino Board SVG -->
+    <div class="board-wrap">
+      <svg width="160" height="120" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+        <!-- PCB board -->
+        <rect x="4" y="4" width="152" height="112" rx="8" fill="#00878A" stroke="#006669" stroke-width="2"/>
+        <rect x="10" y="10" width="140" height="100" rx="5" fill="#007a7d" opacity=".5"/>
+        <!-- Microcontrolador -->
+        <rect x="55" y="35" width="50" height="50" rx="3" fill="#1a1a2e" stroke="#333" stroke-width="1"/>
+        <text x="80" y="63" text-anchor="middle" fill="#ccc" font-size="6" font-family="monospace">ATmega328</text>
+        <!-- Pines digitales (arriba) -->
+        <rect x="12" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="22" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="32" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="42" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="52" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="62" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="72" y="4" width="6" height="10" rx="1" fill="#ffd700"/>
+        <rect x="82" y="4" width="6" height="10" rx="1" fill="#ffd700"/>
+        <rect x="92" y="4" width="6" height="10" rx="1" fill="#ffd700"/>
+        <rect x="102" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="112" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <rect x="122" y="4" width="6" height="10" rx="1" fill="#c0c0c0"/>
+        <!-- Pines analógicos (abajo) -->
+        <rect x="20" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <rect x="30" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <rect x="40" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <rect x="50" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <rect x="60" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <rect x="70" y="106" width="6" height="10" rx="1" fill="#62AEB2"/>
+        <!-- LED de encendido -->
+        <circle cx="130" cy="25" r="4" fill="#00ff00" opacity=".9"/>
+        <!-- Puerto USB -->
+        <rect x="140" y="48" width="18" height="24" rx="3" fill="#888"/>
+        <rect x="143" y="52" width="12" height="16" rx="2" fill="#666"/>
+        <!-- Cristal oscilador -->
+        <rect x="26" y="42" width="14" height="28" rx="3" fill="#c0a000" stroke="#a08000" stroke-width="1"/>
+        <!-- Condensadores -->
+        <circle cx="28" cy="28" r="5" fill="#a0522d" stroke="#8b4513" stroke-width="1"/>
+        <circle cx="40" cy="28" r="5" fill="#a0522d" stroke="#8b4513" stroke-width="1"/>
+        <!-- Botón reset -->
+        <circle cx="135" cy="80" r="6" fill="#cc0000" stroke="#aa0000" stroke-width="1"/>
+        <circle cx="135" cy="80" r="3" fill="#ff4444"/>
+        <!-- Texto Arduino -->
+        <text x="80" y="100" text-anchor="middle" fill="white" font-size="7" font-family="sans-serif" font-weight="bold" opacity=".8">Arduino Uno</text>
+      </svg>
+    </div>
+
+    <div class="mod-badges">
+      <span class="mbadge">microcontrolador</span>
+      <span class="mbadge">pines I/O</span>
+      <span class="mbadge">sensores</span>
+      <span class="mbadge">actuadores</span>
+      <span class="mbadge">comunicación</span>
+      <span class="mbadge">prototipos</span>
+    </div>
+
+    <div class="hero-tag">⚙️ Cultura Digital 2 · Tarea 07</div>
+    <h1 class="hero-title">
+      Componentes de<br>
+      <span class="acc">Ardu</span><span class="acc2">ino</span>
+    </h1>
+    <p class="hero-sub">Investigación completa sobre Arduino y cada uno de sus componentes: características, especificaciones técnicas, ventajas, limitaciones y ejemplos de código para cada uno.</p>
+
+    <div class="hero-stats">
+      <span class="stat-pill">🔬 10 secciones</span>
+      <span class="stat-pill">🧩 +25 componentes</span>
+      <span class="stat-pill">💻 Código incluido</span>
+      <span class="stat-pill">📋 Guía práctica</span>
+    </div>
+
+    <nav class="toc-nav">
+      <a class="toc-link" href="#mod1">1. ¿Qué es Arduino?</a>
+      <a class="toc-link" href="#mod2">2. Microcontrolador</a>
+      <a class="toc-link" href="#mod3">3. Pines I/O</a>
+      <a class="toc-link" href="#mod4">4. Alimentación</a>
+      <a class="toc-link" href="#mod5">5. Sensores</a>
+      <a class="toc-link" href="#mod6">6. Actuadores</a>
+      <a class="toc-link" href="#mod7">7. Comunicación</a>
+      <a class="toc-link" href="#mod8">8. Pantallas</a>
+      <a class="toc-link" href="#mod9">9. Almacenamiento</a>
+      <a class="toc-link" href="#mod10">10. Protección</a>
+    </nav>
+  </div>
+
+  <div class="wave-hero">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#edf6ff" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,30 1440,40 L1440,80 L0,80 Z"/>
+    </svg>
+  </div>
+</header>
+
+<!-- ===== CONTENIDO ===== -->
+<main class="content">
+
+  <!-- ======= 1: QUÉ ES ARDUINO ======= -->
+  <section class="guide-section sec-anchor" id="mod1">
+    <div class="sec-head">
+      <div class="sec-num n-ard">01</div>
+      <div class="sec-titles">
+        <div class="sec-title">¿Qué es Arduino?</div>
+        <div class="sec-sub">Historia, filosofía y ecosistema de la plataforma</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p><strong>Arduino</strong> es una plataforma de electrónica de código abierto (<em>open-source</em>) que combina hardware y software accesibles para estudiantes, artistas, diseñadores, hobbistas y cualquier persona interesada en crear objetos o entornos interactivos. Fue creada en 2005 en el <strong>Instituto de Diseño de Interacción de Ivrea</strong>, Italia, por Massimo Banzi, David Cuartielles, Tom Igoe, Gianluca Martino y David Mellis.</p>
+      <p>Su nombre viene de un bar de Ivrea llamado "Bar di Re Arduino" donde el equipo se reunía. El objetivo era crear una herramienta <strong>barata, fácil de usar y con comunidad activa</strong> para que cualquier persona pudiera hacer proyectos de electrónica sin necesitar un título de ingeniería.</p>
+      <p>Arduino consta de dos partes fundamentales: una <strong>placa de hardware</strong> (el microcontrolador y sus componentes de soporte) y el <strong>IDE de Arduino</strong> (entorno de desarrollo integrado), donde se escribe el código en un lenguaje basado en C/C++ que luego se carga en la placa. Hoy existen más de 30 modelos oficiales de placas Arduino.</p>
+    </div>
+
+    <div class="info-box ib-note">
+      <span class="info-box-icon">🌐</span>
+      <div class="info-box-text"><strong>Open Source Hardware:</strong> Los esquemas de circuito y el código fuente de Arduino son completamente públicos. Cualquier persona puede fabricar su propia placa compatible. Esto ha generado un ecosistema masivo de clones y placas derivadas como el <strong>ESP8266, ESP32, STM32</strong> que utilizan el mismo IDE.</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Modelo</th><th>Microcontrolador</th><th>Pines digitales</th><th>Analógicos</th><th>Velocidad</th></tr></thead>
+        <tbody>
+          <tr><td>Arduino Uno R3</td><td>ATmega328P</td><td>14 (6 PWM)</td><td>6</td><td>16 MHz</td></tr>
+          <tr><td>Arduino Nano</td><td>ATmega328P</td><td>14 (6 PWM)</td><td>8</td><td>16 MHz</td></tr>
+          <tr><td>Arduino Mega 2560</td><td>ATmega2560</td><td>54 (15 PWM)</td><td>16</td><td>16 MHz</td></tr>
+          <tr><td>Arduino Leonardo</td><td>ATmega32U4</td><td>20 (7 PWM)</td><td>12</td><td>16 MHz</td></tr>
+          <tr><td>Arduino MKR Zero</td><td>SAMD21 (ARM)</td><td>22 (12 PWM)</td><td>7</td><td>48 MHz</td></tr>
+          <tr><td>Arduino Portenta H7</td><td>STM32H747 (dual core)</td><td>22 (9 PWM)</td><td>8</td><td>480 MHz</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+        <span class="code-label">estructura_basica.ino</span>
+        <span class="code-tag">ESTRUCTURA ARDUINO</span>
+      </div>
+      <pre><span class="cm">// ===== Estructura de todo programa Arduino =====</span>
+<span class="cm">// Un programa se llama "sketch" y tiene dos funciones obligatorias:</span>
+
+<span class="pp">#define</span> <span class="con">LED_PIN</span> <span class="num">13</span>    <span class="cm">// constante: pin del LED integrado</span>
+
+<span class="cm">// setup() — se ejecuta UNA SOLA VEZ al encender o resetear</span>
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="con">LED_PIN</span>, <span class="con">OUTPUT</span>);   <span class="cm">// configura pin 13 como salida</span>
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="num">9600</span>);          <span class="cm">// abre puerto serie a 9600 baudios</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="str">"Arduino listo!"</span>);
+}
+
+<span class="cm">// loop() — se ejecuta en BUCLE INFINITO mientras haya energía</span>
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(<span class="con">LED_PIN</span>, <span class="con">HIGH</span>); <span class="cm">// enciende LED</span>
+  <span class="fn">delay</span>(<span class="num">1000</span>);                  <span class="cm">// espera 1000ms = 1 segundo</span>
+  <span class="fn">digitalWrite</span>(<span class="con">LED_PIN</span>, <span class="con">LOW</span>);  <span class="cm">// apaga LED</span>
+  <span class="fn">delay</span>(<span class="num">1000</span>);
+}</pre>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 2: MICROCONTROLADOR ======= -->
+  <section class="guide-section sec-anchor" id="mod2">
+    <div class="sec-head">
+      <div class="sec-num n-yel">02</div>
+      <div class="sec-titles">
+        <div class="sec-title">El Microcontrolador</div>
+        <div class="sec-sub">El cerebro de Arduino: ATmega328P y sus características internas</div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-micro">
+      <div class="comp-header">
+        <div class="comp-icon ci-amber">🧠</div>
+        <div class="comp-meta">
+          <div class="comp-name">ATmega328P — Microcontrolador Principal</div>
+          <div class="comp-cat">🔧 Unidad Central de Procesamiento</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>ATmega328P</strong> de Atmel (ahora Microchip) es el corazón del Arduino Uno. Es un microcontrolador de 8 bits basado en la arquitectura AVR RISC. Todo lo que hace Arduino —leer sensores, controlar motores, comunicarse— pasa por este chip. Integra en un solo encapsulado la CPU, memoria, puertos de entrada/salida, conversores analógico-digitales y módulos de comunicación.</p>
+
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Arquitectura</div><div class="spec-value">AVR 8-bit RISC</div></div>
+          <div class="spec-chip"><div class="spec-label">Velocidad</div><div class="spec-value">16 MHz</div></div>
+          <div class="spec-chip"><div class="spec-label">Flash (programa)</div><div class="spec-value">32 KB</div></div>
+          <div class="spec-chip"><div class="spec-label">SRAM (variables)</div><div class="spec-value">2 KB</div></div>
+          <div class="spec-chip"><div class="spec-label">EEPROM (guardado)</div><div class="spec-value">1 KB</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje operación</div><div class="spec-value">1.8V – 5.5V</div></div>
+          <div class="spec-chip"><div class="spec-label">Consumo activo</div><div class="spec-value">~0.2 mA/MHz</div></div>
+          <div class="spec-chip"><div class="spec-label">Modo sleep</div><div class="spec-value">&lt; 1 µA</div></div>
+        </div>
+
+        <div class="info-box ib-note" style="margin-bottom:16px;">
+          <span class="info-box-icon">💾</span>
+          <div class="info-box-text"><strong>Los 3 tipos de memoria del ATmega328P:</strong><br>
+            <code>Flash (32 KB)</code> — Donde se almacena el sketch (programa). Se borra con cada carga.<br>
+            <code>SRAM (2 KB)</code> — Memoria de trabajo: variables, pila de ejecución. Se borra al apagar.<br>
+            <code>EEPROM (1 KB)</code> — Memoria permanente: guarda datos aunque se quite la energía. Ciclos de escritura limitados (~100,000).
+          </div>
+        </div>
+
+        <div class="ven-lim-grid">
+          <div class="ven-box">
+            <div class="vl-title">✅ Ventajas</div>
+            <ul class="vl-list">
+              <li>Bajo consumo energético, ideal para proyectos con batería</li>
+              <li>Muy bien documentado y con enorme comunidad</li>
+              <li>Múltiples modos de bajo consumo (sleep modes)</li>
+              <li>Integra ADC de 10 bits de alta precisión</li>
+              <li>Precio muy bajo (~$2-5 USD el chip solo)</li>
+              <li>Reloj de tiempo real interno calibrado</li>
+            </ul>
+          </div>
+          <div class="lim-box">
+            <div class="vl-title">⚠️ Limitaciones</div>
+            <ul class="vl-list">
+              <li>Solo 2 KB de RAM: muy limitado para datos grandes</li>
+              <li>No tiene Wi-Fi ni Bluetooth integrado</li>
+              <li>8 bits: no ideal para cálculos en coma flotante</li>
+              <li>32 KB de Flash: programas complejos pueden no caber</li>
+              <li>Sin sistema operativo: solo un programa a la vez</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 3: PINES I/O ======= -->
+  <section class="guide-section sec-anchor" id="mod3">
+    <div class="sec-head">
+      <div class="sec-num n-blu">03</div>
+      <div class="sec-titles">
+        <div class="sec-title">Pines de Entrada / Salida</div>
+        <div class="sec-sub">Digitales, analógicos, PWM y sus funciones específicas</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Los <strong>pines</strong> son los puntos de conexión física entre Arduino y el mundo exterior. Son las "manos y oídos" del microcontrolador. Se dividen en pines digitales (señales de 0V o 5V), analógicos (voltaje variable), y pines especiales con funciones adicionales como PWM, comunicación serial o I2C.</p>
+    </div>
+
+    <!-- Mapa visual de pines -->
+    <div class="pin-visual">
+      <div class="pin pin-pwr">5V<br><small>Poder</small></div>
+      <div class="pin pin-pwr">3.3V<br><small>Poder</small></div>
+      <div class="pin pin-gnd">GND<br><small>Tierra</small></div>
+      <div class="pin pin-gnd">GND<br><small>Tierra</small></div>
+      <div class="pin pin-dig">D0/RX<br><small>Serial</small></div>
+      <div class="pin pin-dig">D1/TX<br><small>Serial</small></div>
+      <div class="pin pin-dig">D2<br><small>INT</small></div>
+      <div class="pin pin-dig">D3<br><small>INT</small></div>
+      <div class="pin pin-pwm">D3~<br><small>PWM</small></div>
+      <div class="pin pin-pwm">D5~<br><small>PWM</small></div>
+      <div class="pin pin-pwm">D6~<br><small>PWM</small></div>
+      <div class="pin pin-dig">D7<br><small>Digital</small></div>
+      <div class="pin pin-dig">D8<br><small>Digital</small></div>
+      <div class="pin pin-pwm">D9~<br><small>PWM</small></div>
+      <div class="pin pin-pwm">D10~<br><small>PWM/SS</small></div>
+      <div class="pin pin-pwm">D11~<br><small>PWM/MOSI</small></div>
+      <div class="pin pin-dig">D12<br><small>MISO</small></div>
+      <div class="pin pin-dig">D13<br><small>SCK/LED</small></div>
+      <div class="pin pin-ana">A0<br><small>Analógico</small></div>
+      <div class="pin pin-ana">A1<br><small>Analógico</small></div>
+      <div class="pin pin-ana">A2<br><small>Analógico</small></div>
+      <div class="pin pin-ana">A3<br><small>Analógico</small></div>
+      <div class="pin pin-ana">A4/SDA<br><small>I2C</small></div>
+      <div class="pin pin-ana">A5/SCL<br><small>I2C</small></div>
+    </div>
+
+    <div class="comp-section cs-pin">
+      <div class="comp-header">
+        <div class="comp-icon ci-blue">🔌</div>
+        <div class="comp-meta">
+          <div class="comp-name">Pines Digitales (D0 – D13)</div>
+          <div class="comp-cat">📶 Entradas y Salidas Digitales</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">Los pines digitales solo reconocen dos estados: <strong>HIGH (5V / 1 lógico)</strong> y <strong>LOW (0V / 0 lógico)</strong>. Pueden configurarse como entrada (leer botones, sensores digitales) o como salida (encender LEDs, activar relés). Los pines marcados con <code>~</code> también soportan PWM.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Voltaje HIGH</div><div class="spec-value">5V (o 3.3V)</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje LOW</div><div class="spec-value">0V (GND)</div></div>
+          <div class="spec-chip"><div class="spec-label">Corriente máx/pin</div><div class="spec-value">40 mA</div></div>
+          <div class="spec-chip"><div class="spec-label">Corriente total</div><div class="spec-value">200 mA</div></div>
+          <div class="spec-chip"><div class="spec-label">Pines con PWM</div><div class="spec-value">6 (3,5,6,9,10,11)</div></div>
+          <div class="spec-chip"><div class="spec-label">Resistencia pull-up</div><div class="spec-value">20–50 kΩ</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box">
+            <div class="vl-title">✅ Ventajas</div>
+            <ul class="vl-list">
+              <li>Fáciles de usar con digitalWrite() y digitalRead()</li>
+              <li>Resistencia pull-up interna activable por software</li>
+              <li>Compatibles con la mayoría de módulos del mercado</li>
+              <li>Pines de interrupción (D2, D3) reaccionan sin polling</li>
+            </ul>
+          </div>
+          <div class="lim-box">
+            <div class="vl-title">⚠️ Limitaciones</div>
+            <ul class="vl-list">
+              <li>Máximo 40 mA por pin: no pueden manejar motores directamente</li>
+              <li>Solo HIGH o LOW: sin valores intermedios sin PWM</li>
+              <li>Voltaje 5V: puede dañar sensores de 3.3V sin divisor</li>
+            </ul>
+          </div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header">
+            <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+            <span class="code-label">pines_digitales.ino</span>
+            <span class="code-tag">DIGITAL</span>
+          </div>
+          <pre><span class="kw">const int</span> <span class="var">LED</span>   = <span class="num">13</span>;
+<span class="kw">const int</span> <span class="var">BOTON</span> = <span class="num">2</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="var">LED</span>,   <span class="con">OUTPUT</span>);
+  <span class="fn">pinMode</span>(<span class="var">BOTON</span>, <span class="con">INPUT_PULLUP</span>); <span class="cm">// pull-up interno activado</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">int</span> <span class="var">estado</span> = <span class="fn">digitalRead</span>(<span class="var">BOTON</span>); <span class="cm">// leer botón</span>
+
+  <span class="kw">if</span> (<span class="var">estado</span> == <span class="con">LOW</span>) {  <span class="cm">// LOW = presionado (pull-up)</span>
+    <span class="fn">digitalWrite</span>(<span class="var">LED</span>, <span class="con">HIGH</span>); <span class="cm">// encender LED</span>
+  } <span class="kw">else</span> {
+    <span class="fn">digitalWrite</span>(<span class="var">LED</span>, <span class="con">LOW</span>);  <span class="cm">// apagar LED</span>
+  }
+}
+
+<span class="cm">// PWM: simular voltaje analógico con señal digital</span>
+<span class="kw">void</span> <span class="fn">ejemploPWM</span>() {
+  <span class="fn">analogWrite</span>(<span class="num">9</span>, <span class="num">0</span>);    <span class="cm">// 0% brillo   (0V equivalente)</span>
+  <span class="fn">analogWrite</span>(<span class="num">9</span>, <span class="num">127</span>);  <span class="cm">// 50% brillo  (2.5V equivalente)</span>
+  <span class="fn">analogWrite</span>(<span class="num">9</span>, <span class="num">255</span>);  <span class="cm">// 100% brillo (5V equivalente)</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-pin" style="border-color:#f59e0b;">
+      <div class="comp-header">
+        <div class="comp-icon ci-amber">📊</div>
+        <div class="comp-meta">
+          <div class="comp-name">Pines Analógicos (A0 – A5)</div>
+          <div class="comp-cat">📈 Conversores Analógico-Digital (ADC)</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">Los pines analógicos A0-A5 pueden leer voltajes continuos de <strong>0V a 5V</strong> y convertirlos a un número entero de <strong>0 a 1023</strong> (resolución de 10 bits). Son esenciales para sensores que producen señales continuas: temperatura, luz, humedad, presión, posición de potenciómetros, etc.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Resolución ADC</div><div class="spec-value">10 bits (0-1023)</div></div>
+          <div class="spec-chip"><div class="spec-label">Rango entrada</div><div class="spec-value">0V – 5V</div></div>
+          <div class="spec-chip"><div class="spec-label">Precisión</div><div class="spec-value">~4.9 mV/paso</div></div>
+          <div class="spec-chip"><div class="spec-label">Tiempo conversión</div><div class="spec-value">~100 µs</div></div>
+          <div class="spec-chip"><div class="spec-label">Pines disponibles</div><div class="spec-value">6 (Uno) / 16 (Mega)</div></div>
+          <div class="spec-chip"><div class="spec-label">Uso como digital</div><div class="spec-value">Sí (A0=D14...)</div></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header">
+            <div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div>
+            <span class="code-label">pines_analogicos.ino</span>
+            <span class="code-tag">ANALÓGICO</span>
+          </div>
+          <pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="num">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">int</span> <span class="var">valor</span> = <span class="fn">analogRead</span>(<span class="con">A0</span>);   <span class="cm">// leer pin A0 (0-1023)</span>
+
+  <span class="cm">// Convertir a voltaje real</span>
+  <span class="kw">float</span> <span class="var">voltaje</span> = <span class="var">valor</span> * (<span class="num">5.0</span> / <span class="num">1023.0</span>);
+
+  <span class="cm">// Mapa de valores: de 0-1023 a 0-255</span>
+  <span class="kw">int</span> <span class="var">brillo</span> = <span class="fn">map</span>(<span class="var">valor</span>, <span class="num">0</span>, <span class="num">1023</span>, <span class="num">0</span>, <span class="num">255</span>);
+  <span class="fn">analogWrite</span>(<span class="num">9</span>, <span class="var">brillo</span>);         <span class="cm">// controlar LED con potenciómetro</span>
+
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"Valor: "</span>); <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="var">valor</span>);
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"  Voltaje: "</span>); <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="var">voltaje</span>);
+  <span class="fn">delay</span>(<span class="num">100</span>);
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 4: ALIMENTACIÓN ======= -->
+  <section class="guide-section sec-anchor" id="mod4">
+    <div class="sec-head">
+      <div class="sec-num n-org">04</div>
+      <div class="sec-titles">
+        <div class="sec-title">Sistema de Alimentación</div>
+        <div class="sec-sub">Fuentes de energía, reguladores y pines de potencia</div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-pwr">
+      <div class="comp-header">
+        <div class="comp-icon ci-red">🔋</div>
+        <div class="comp-meta">
+          <div class="comp-name">Sistema de Alimentación de Arduino</div>
+          <div class="comp-cat">⚡ Gestión de Energía</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">Arduino puede recibir energía de tres fuentes: el <strong>puerto USB</strong> (desde la computadora, 5V / 500 mA), el <strong>jack de alimentación externa</strong> (7–12V DC recomendado, acepta hasta 20V con pérdida de calor), o directamente por el <strong>pin Vin</strong>. Un regulador de voltaje integrado (NCP1117) convierte la entrada a 5V estables. También incluye un regulador a 3.3V (150 mA máx).</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Voltaje USB</div><div class="spec-value">5V (del PC)</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje externo rec.</div><div class="spec-value">7 – 12V DC</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje externo máx.</div><div class="spec-value">20V DC</div></div>
+          <div class="spec-chip"><div class="spec-label">Salida 5V (max)</div><div class="spec-value">800 mA</div></div>
+          <div class="spec-chip"><div class="spec-label">Salida 3.3V (max)</div><div class="spec-value">150 mA</div></div>
+          <div class="spec-chip"><div class="spec-label">Regulador</div><div class="spec-value">NCP1117 LDO</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box">
+            <div class="vl-title">✅ Ventajas</div>
+            <ul class="vl-list">
+              <li>Selección automática de fuente (USB vs. externa)</li>
+              <li>Protección contra polaridad inversa en versiones recientes</li>
+              <li>Salida de 3.3V integrada para sensores modernos</li>
+              <li>Puede alimentarse con baterías 9V de forma sencilla</li>
+            </ul>
+          </div>
+          <div class="lim-box">
+            <div class="vl-title">⚠️ Limitaciones</div>
+            <ul class="vl-list">
+              <li>El regulador se calienta mucho con voltajes cercanos a 20V</li>
+              <li>Solo 150 mA en el pin 3.3V: insuficiente para Wi-Fi chips</li>
+              <li>Sin gestión de batería recargable integrada</li>
+              <li>No hay protección automática contra sobrecorriente en pines</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 5: SENSORES ======= -->
+  <section class="guide-section sec-anchor" id="mod5">
+    <div class="sec-head">
+      <div class="sec-num n-grn">05</div>
+      <div class="sec-titles">
+        <div class="sec-title">Sensores</div>
+        <div class="sec-sub">Los "sentidos" de Arduino: temperatura, distancia, luz, movimiento y más</div>
+      </div>
+    </div>
+
+    <!-- DHT22 -->
+    <div class="comp-section cs-sens">
+      <div class="comp-header">
+        <div class="comp-icon ci-green">🌡️</div>
+        <div class="comp-meta">
+          <div class="comp-name">DHT22 — Sensor de Temperatura y Humedad</div>
+          <div class="comp-cat">🌿 Sensor Ambiental Digital</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>DHT22</strong> (también llamado AM2302) mide temperatura ambiente (−40°C a +80°C) y humedad relativa (0% a 100%) con alta precisión. Usa un protocolo de comunicación digital de un solo cable. Es la versión mejorada del popular DHT11, con mayor rango y mejor resolución.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Rango temp.</div><div class="spec-value">-40°C a +80°C</div></div>
+          <div class="spec-chip"><div class="spec-label">Precisión temp.</div><div class="spec-value">±0.5°C</div></div>
+          <div class="spec-chip"><div class="spec-label">Rango humedad</div><div class="spec-value">0% – 100% RH</div></div>
+          <div class="spec-chip"><div class="spec-label">Precisión humedad</div><div class="spec-value">±2% RH</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">3.3V – 6V</div></div>
+          <div class="spec-chip"><div class="spec-label">Muestreo</div><div class="spec-value">Cada 2 segundos</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box"><div class="vl-title">✅ Ventajas</div><ul class="vl-list">
+            <li>Un solo pin de datos, muy fácil de conectar</li>
+            <li>Salida digital calibrada de fábrica</li>
+            <li>Librería Arduino de uso simple (DHT.h)</li>
+            <li>Mayor precisión que el DHT11</li>
+          </ul></div>
+          <div class="lim-box"><div class="vl-title">⚠️ Limitaciones</div><ul class="vl-list">
+            <li>Solo una lectura cada 2 segundos</li>
+            <li>Sensible a la condensación extrema</li>
+            <li>Requiere resistencia de pull-up de 10 kΩ</li>
+          </ul></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">dht22.ino</span><span class="code-tag">SENSOR</span></div>
+          <pre><span class="pp">#include</span> <span class="str">&lt;DHT.h&gt;</span>
+<span class="pp">#define</span> <span class="con">DHTPIN</span>  <span class="num">4</span>       <span class="cm">// pin de datos</span>
+<span class="pp">#define</span> <span class="con">DHTTYPE</span> DHT22  <span class="cm">// modelo del sensor</span>
+<span class="var">DHT</span> <span class="fn">dht</span>(<span class="con">DHTPIN</span>, <span class="con">DHTTYPE</span>);
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="num">9600</span>);
+  <span class="var">dht</span>.<span class="fn">begin</span>();
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">float</span> <span class="var">temp</span> = <span class="var">dht</span>.<span class="fn">readTemperature</span>();
+  <span class="kw">float</span> <span class="var">hum</span>  = <span class="var">dht</span>.<span class="fn">readHumidity</span>();
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"Temp: "</span>); <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="var">temp</span>); <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"°C  "</span>);
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"Humedad: "</span>); <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="var">hum</span>); <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="str">"%"</span>);
+  <span class="fn">delay</span>(<span class="num">2000</span>);
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- HC-SR04 -->
+    <div class="comp-section cs-sens" style="border-color:#0891b2;">
+      <div class="comp-header">
+        <div class="comp-icon ci-sky">📡</div>
+        <div class="comp-meta">
+          <div class="comp-name">HC-SR04 — Sensor Ultrasónico de Distancia</div>
+          <div class="comp-cat">📏 Sensor de Proximidad</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>HC-SR04</strong> utiliza ultrasonido (40 kHz) para medir distancias de <strong>2 cm a 400 cm</strong> con precisión de 3 mm. Emite un pulso ultrasónico por el pin <code>Trig</code> y mide el tiempo que tarda el eco en regresar por el pin <code>Echo</code>. La distancia se calcula con la fórmula: <code>distancia = (tiempo × 0.0343) / 2</code>.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Rango</div><div class="spec-value">2 cm – 400 cm</div></div>
+          <div class="spec-chip"><div class="spec-label">Precisión</div><div class="spec-value">±3 mm</div></div>
+          <div class="spec-chip"><div class="spec-label">Ángulo efectivo</div><div class="spec-value">15°</div></div>
+          <div class="spec-chip"><div class="spec-label">Frecuencia</div><div class="spec-value">40 kHz</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">5V DC</div></div>
+          <div class="spec-chip"><div class="spec-label">Corriente</div><div class="spec-value">15 mA</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box"><div class="vl-title">✅ Ventajas</div><ul class="vl-list">
+            <li>Muy económico (~$1-2 USD)</li>
+            <li>Fácil de usar con pulseIn()</li>
+            <li>No requiere contacto físico con el objeto</li>
+            <li>Funciona en oscuridad total</li>
+          </ul></div>
+          <div class="lim-box"><div class="vl-title">⚠️ Limitaciones</div><ul class="vl-list">
+            <li>Superficies blandas o en ángulo pueden no reflejar bien</li>
+            <li>Ángulo estrecho: solo detecta lo que está al frente</li>
+            <li>No funciona bien bajo el agua o en polvo</li>
+          </ul></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">hc_sr04.ino</span><span class="code-tag">ULTRASONIDO</span></div>
+          <pre><span class="kw">const int</span> <span class="var">TRIG</span> = <span class="num">9</span>, <span class="var">ECHO</span> = <span class="num">10</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="var">TRIG</span>, <span class="con">OUTPUT</span>);
+  <span class="fn">pinMode</span>(<span class="var">ECHO</span>, <span class="con">INPUT</span>);
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="num">9600</span>);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(<span class="var">TRIG</span>, <span class="con">LOW</span>);  <span class="fn">delayMicroseconds</span>(<span class="num">2</span>);
+  <span class="fn">digitalWrite</span>(<span class="var">TRIG</span>, <span class="con">HIGH</span>); <span class="fn">delayMicroseconds</span>(<span class="num">10</span>);
+  <span class="fn">digitalWrite</span>(<span class="var">TRIG</span>, <span class="con">LOW</span>);
+
+  <span class="kw">long</span> <span class="var">duracion</span> = <span class="fn">pulseIn</span>(<span class="var">ECHO</span>, <span class="con">HIGH</span>);
+  <span class="kw">float</span> <span class="var">dist</span> = (<span class="var">duracion</span> * <span class="num">0.0343</span>) / <span class="num">2.0</span>;
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="str">"Distancia: "</span>); <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="var">dist</span>); <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="str">" cm"</span>);
+  <span class="fn">delay</span>(<span class="num">200</span>);
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIR -->
+    <div class="comp-section cs-sens" style="border-color:#7c3aed;">
+      <div class="comp-header">
+        <div class="comp-icon ci-purple">👁️</div>
+        <div class="comp-meta">
+          <div class="comp-name">PIR HC-SR501 — Sensor de Movimiento Infrarrojo Pasivo</div>
+          <div class="comp-cat">🔍 Sensor de Presencia</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El sensor <strong>PIR (Passive Infrared)</strong> detecta el calor infrarrojo emitido por personas y animales en movimiento. Tiene dos potenciómetros ajustables: sensibilidad (hasta 7 metros) y tiempo de retardo (2–300 segundos). Cuando detecta movimiento, su salida va a <strong>HIGH</strong> durante el tiempo configurado. Es el sensor estándar de alarmas y luces automáticas.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Rango detección</div><div class="spec-value">Hasta 7 metros</div></div>
+          <div class="spec-chip"><div class="spec-label">Ángulo</div><div class="spec-value">110° cono</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">5V – 20V</div></div>
+          <div class="spec-chip"><div class="spec-label">Retardo ajustable</div><div class="spec-value">2s – 300s</div></div>
+          <div class="spec-chip"><div class="spec-label">Tiempo calentamiento</div><div class="spec-value">30–60 segundos</div></div>
+          <div class="spec-chip"><div class="spec-label">Salida</div><div class="spec-value">Digital 3.3V</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box"><div class="vl-title">✅ Ventajas</div><ul class="vl-list">
+            <li>Bajo consumo en espera (pasivo)</li>
+            <li>Muy económico y confiable</li>
+            <li>Gran ángulo de detección</li>
+            <li>Ajuste de sensibilidad y retardo</li>
+          </ul></div>
+          <div class="lim-box"><div class="vl-title">⚠️ Limitaciones</div><ul class="vl-list">
+            <li>Necesita 30-60s para estabilizarse al encender</li>
+            <li>Detecta movimiento, no presencia estática</li>
+            <li>Afectado por fuentes de calor cercanas</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 6: ACTUADORES ======= -->
+  <section class="guide-section sec-anchor" id="mod6">
+    <div class="sec-head">
+      <div class="sec-num n-pur">06</div>
+      <div class="sec-titles">
+        <div class="sec-title">Actuadores</div>
+        <div class="sec-sub">Componentes que ejecutan acciones físicas: motores, LEDs, buzzer y relés</div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-act">
+      <div class="comp-header">
+        <div class="comp-icon ci-amber">⚙️</div>
+        <div class="comp-meta">
+          <div class="comp-name">Servo Motor SG90 — Control de Posición Angular</div>
+          <div class="comp-cat">🔄 Actuador Rotacional</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>servo SG90</strong> es un motor con engranajes y circuito de control integrado que permite posicionarlo con precisión en ángulos de <strong>0° a 180°</strong>. Se controla con señales PWM: el ancho del pulso determina la posición. Incluye tres cables: rojo (5V), marrón (GND) y naranja (señal).</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Rango angular</div><div class="spec-value">0° – 180°</div></div>
+          <div class="spec-chip"><div class="spec-label">Torque</div><div class="spec-value">1.8 kg·cm</div></div>
+          <div class="spec-chip"><div class="spec-label">Velocidad</div><div class="spec-value">0.1s / 60°</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">4.8V – 6V</div></div>
+          <div class="spec-chip"><div class="spec-label">Peso</div><div class="spec-value">9 gramos</div></div>
+          <div class="spec-chip"><div class="spec-label">Señal PWM</div><div class="spec-value">50 Hz, 1-2ms</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box"><div class="vl-title">✅ Ventajas</div><ul class="vl-list">
+            <li>Posicionamiento preciso y repetible</li>
+            <li>Librería Servo.h incluida en Arduino IDE</li>
+            <li>Económico y disponible en todo el mundo</li>
+            <li>Perfecto para robótica y mecanismos</li>
+          </ul></div>
+          <div class="lim-box"><div class="vl-title">⚠️ Limitaciones</div><ul class="vl-list">
+            <li>Solo 180°, no da vueltas completas (salvo MG996R)</li>
+            <li>Consume bastante corriente al moverse</li>
+            <li>Torque bajo para cargas pesadas</li>
+          </ul></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">servo_sg90.ino</span><span class="code-tag">SERVO</span></div>
+          <pre><span class="pp">#include</span> <span class="str">&lt;Servo.h&gt;</span>
+<span class="var">Servo</span> <span class="var">miServo</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="var">miServo</span>.<span class="fn">attach</span>(<span class="num">9</span>); <span class="cm">// servo en pin 9</span>
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">for</span> (<span class="kw">int</span> <span class="var">pos</span>=<span class="num">0</span>; <span class="var">pos</span>&lt;=<span class="num">180</span>; <span class="var">pos</span>++) {
+    <span class="var">miServo</span>.<span class="fn">write</span>(<span class="var">pos</span>);  <span class="cm">// ir de 0° a 180°</span>
+    <span class="fn">delay</span>(<span class="num">15</span>);
+  }
+  <span class="kw">for</span> (<span class="kw">int</span> <span class="var">pos</span>=<span class="num">180</span>; <span class="var">pos</span>&gt;=<span class="num">0</span>; <span class="var">pos</span>--) {
+    <span class="var">miServo</span>.<span class="fn">write</span>(<span class="var">pos</span>);  <span class="cm">// regresar a 0°</span>
+    <span class="fn">delay</span>(<span class="num">15</span>);
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-act" style="border-color:#dc2626;">
+      <div class="comp-header">
+        <div class="comp-icon ci-red">🔁</div>
+        <div class="comp-meta">
+          <div class="comp-name">Módulo Relé — Control de Alta Potencia</div>
+          <div class="comp-cat">🔌 Interruptor Eléctrico Controlado</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">Un <strong>relé</strong> es un interruptor electromecánico que permite a Arduino (5V, señales débiles) controlar circuitos de <strong>alta tensión</strong> (110V-220V AC, cargas de hasta 10A). Al aplicar voltaje a su bobina, cierra o abre contactos que controlan el circuito principal. Esencial para controlar focos, electrodomésticos o motores industriales.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Carga AC</div><div class="spec-value">250V / 10A</div></div>
+          <div class="spec-chip"><div class="spec-label">Carga DC</div><div class="spec-value">30V / 10A</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje bobina</div><div class="spec-value">5V DC</div></div>
+          <div class="spec-chip"><div class="spec-label">Corriente bobina</div><div class="spec-value">~70-90 mA</div></div>
+          <div class="spec-chip"><div class="spec-label">Aislamiento</div><div class="spec-value">Galvánico</div></div>
+          <div class="spec-chip"><div class="spec-label">Tiempo conmutación</div><div class="spec-value">~10 ms</div></div>
+        </div>
+        <div class="info-box ib-warn">
+          <span class="info-box-icon">⚠️</span>
+          <div class="info-box-text"><strong>¡Precaución con voltajes AC!</strong> Al trabajar con 110V o 220V, el riesgo de electrocución es real. Siempre usa el relé con la corriente desconectada al hacer conexiones. Nunca toques los terminales AC cuando el circuito esté energizado. Los módulos de relé para Arduino incluyen aislamiento óptico (optoacoplador) para proteger la placa.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 7: COMUNICACIÓN ======= -->
+  <section class="guide-section sec-anchor" id="mod7">
+    <div class="sec-head">
+      <div class="sec-num n-pur">07</div>
+      <div class="sec-titles">
+        <div class="sec-title">Módulos de Comunicación</div>
+        <div class="sec-sub">Bluetooth, Wi-Fi, RF, I2C, SPI y comunicación serial</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Módulo</th><th>Tecnología</th><th>Rango</th><th>Velocidad</th><th>Uso típico</th></tr></thead>
+        <tbody>
+          <tr><td>HC-05 / HC-06</td><td>Bluetooth 2.0</td><td>~10 m</td><td>1 Mbps</td><td>App móvil ↔ Arduino</td></tr>
+          <tr><td>ESP8266 (ESP-01)</td><td>Wi-Fi 802.11 b/g/n</td><td>~100 m</td><td>72 Mbps</td><td>IoT, control web</td></tr>
+          <tr><td>NRF24L01</td><td>RF 2.4 GHz</td><td>~100 m (1 km con antena)</td><td>2 Mbps</td><td>Control remoto, nodos inalámbricos</td></tr>
+          <tr><td>LoRa SX1278</td><td>RF 433/915 MHz</td><td>Hasta 10 km</td><td>~37 kbps</td><td>IoT largo alcance, rural</td></tr>
+          <tr><td>SIM800L</td><td>GSM/GPRS 2G</td><td>Red celular</td><td>85 kbps</td><td>SMS, llamadas, datos móviles</td></tr>
+          <tr><td>I2C (bus)</td><td>Protocolo serial 2 hilos</td><td>1 metro</td><td>100-400 kHz</td><td>Múltiples sensores en 2 pines</td></tr>
+          <tr><td>SPI (bus)</td><td>Protocolo serial 4 hilos</td><td>Corto</td><td>Hasta 10 MHz</td><td>SD cards, pantallas, alta velocidad</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="comp-section cs-com">
+      <div class="comp-header">
+        <div class="comp-icon ci-purple">📶</div>
+        <div class="comp-meta">
+          <div class="comp-name">HC-05 — Módulo Bluetooth</div>
+          <div class="comp-cat">📱 Comunicación Inalámbrica de Corto Alcance</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>HC-05</strong> permite conectar Arduino con teléfonos Android, computadoras y otros dispositivos Bluetooth. Trabaja en modo maestro/esclavo y se comunica con Arduino mediante el protocolo UART (Serial). Con aplicaciones como "Serial Bluetooth Terminal" en Android se puede enviar y recibir datos de forma inalámbrica sin Wi-Fi ni internet.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Versión BT</div><div class="spec-value">Bluetooth 2.0</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">3.3V (lógica)</div></div>
+          <div class="spec-chip"><div class="spec-label">Alimentación</div><div class="spec-value">5V (VCC)</div></div>
+          <div class="spec-chip"><div class="spec-label">Alcance</div><div class="spec-value">~10 metros</div></div>
+          <div class="spec-chip"><div class="spec-label">Interfaz</div><div class="spec-value">UART (TX/RX)</div></div>
+          <div class="spec-chip"><div class="spec-label">Baud rate</div><div class="spec-value">9600 (default)</div></div>
+        </div>
+        <div class="info-box ib-warn">
+          <span class="info-box-icon">⚡</span>
+          <div class="info-box-text"><strong>¡Atención con el voltaje!</strong> El pin RX del HC-05 opera a <strong>3.3V lógico</strong>. Si Arduino envía 5V al RX del HC-05, puede dañarlo. Usa un divisor de voltaje (2 resistencias) o un convertidor de nivel lógico entre Arduino TX (5V) y HC-05 RX.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 8: PANTALLAS ======= -->
+  <section class="guide-section sec-anchor" id="mod8">
+    <div class="sec-head">
+      <div class="sec-num n-rose">08</div>
+      <div class="sec-titles">
+        <div class="sec-title">Pantallas y Displays</div>
+        <div class="sec-sub">LCD, OLED y displays de 7 segmentos para mostrar información</div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-disp">
+      <div class="comp-header">
+        <div class="comp-icon ci-pink">🖥️</div>
+        <div class="comp-meta">
+          <div class="comp-name">LCD 16×2 con módulo I2C</div>
+          <div class="comp-cat">📺 Display de Cristal Líquido</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>LCD 16×2</strong> muestra 2 líneas de 16 caracteres ASCII cada una. El módulo <strong>I2C</strong> (PCF8574) adaptador reduce la conexión de 16 cables a solo 4 (VCC, GND, SDA, SCL), liberando pines del Arduino. Soporta texto, caracteres personalizados y mensajes dinámicos. Es el display más económico y didáctico para proyectos de Arduino.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Caracteres</div><div class="spec-value">16 col × 2 filas</div></div>
+          <div class="spec-chip"><div class="spec-label">Interfaz</div><div class="spec-value">I2C (con módulo)</div></div>
+          <div class="spec-chip"><div class="spec-label">Dirección I2C</div><div class="spec-value">0x27 o 0x3F</div></div>
+          <div class="spec-chip"><div class="spec-label">Voltaje</div><div class="spec-value">5V</div></div>
+          <div class="spec-chip"><div class="spec-label">Backlight</div><div class="spec-value">LED azul/verde</div></div>
+          <div class="spec-chip"><div class="spec-label">Caracteres propios</div><div class="spec-value">8 personalizables</div></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header"><div class="code-dots"><div class="cd r"></div><div class="cd y"></div><div class="cd g"></div></div><span class="code-label">lcd_i2c.ino</span><span class="code-tag">LCD</span></div>
+          <pre><span class="pp">#include</span> <span class="str">&lt;Wire.h&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;LiquidCrystal_I2C.h&gt;</span>
+
+<span class="cm">// Dirección I2C, columnas, filas</span>
+<span class="var">LiquidCrystal_I2C</span> <span class="fn">lcd</span>(<span class="num">0x27</span>, <span class="num">16</span>, <span class="num">2</span>);
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="var">lcd</span>.<span class="fn">init</span>();
+  <span class="var">lcd</span>.<span class="fn">backlight</span>();          <span class="cm">// encender retroiluminación</span>
+  <span class="var">lcd</span>.<span class="fn">setCursor</span>(<span class="num">0</span>, <span class="num">0</span>);     <span class="cm">// columna 0, fila 0</span>
+  <span class="var">lcd</span>.<span class="fn">print</span>(<span class="str">"Cultura Digital"</span>);
+  <span class="var">lcd</span>.<span class="fn">setCursor</span>(<span class="num">0</span>, <span class="num">1</span>);     <span class="cm">// columna 0, fila 1</span>
+  <span class="var">lcd</span>.<span class="fn">print</span>(<span class="str">"Semestre 2 de IA"</span>);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() { }</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 9: ALMACENAMIENTO ======= -->
+  <section class="guide-section sec-anchor" id="mod9">
+    <div class="sec-head">
+      <div class="sec-num n-sky">09</div>
+      <div class="sec-titles">
+        <div class="sec-title">Almacenamiento de Datos</div>
+        <div class="sec-sub">EEPROM interna, módulo SD y RTC para guardar información</div>
+      </div>
+    </div>
+
+    <div class="comp-section cs-mem">
+      <div class="comp-header">
+        <div class="comp-icon ci-sky">💾</div>
+        <div class="comp-meta">
+          <div class="comp-name">Módulo Tarjeta SD + RTC DS3231</div>
+          <div class="comp-cat">📦 Almacenamiento y Registro de Datos</div>
+        </div>
+      </div>
+      <div class="comp-body">
+        <p class="comp-desc">El <strong>módulo SD</strong> permite leer y escribir archivos en tarjetas MicroSD (FAT16/FAT32) usando el protocolo SPI. El <strong>DS3231</strong> es un reloj de tiempo real (RTC) de alta precisión con memoria de batería que mantiene la hora exacta incluso sin energía. Combinados, forman un sistema de <strong>datalogger</strong> para registrar lecturas de sensores con marca de tiempo.</p>
+        <div class="specs-grid">
+          <div class="spec-chip"><div class="spec-label">Protocolo SD</div><div class="spec-value">SPI</div></div>
+          <div class="spec-chip"><div class="spec-label">Capacidad SD</div><div class="spec-value">Hasta 32 GB</div></div>
+          <div class="spec-chip"><div class="spec-label">Formato</div><div class="spec-value">FAT16 / FAT32</div></div>
+          <div class="spec-chip"><div class="spec-label">RTC protocolo</div><div class="spec-value">I2C</div></div>
+          <div class="spec-chip"><div class="spec-label">RTC precisión</div><div class="spec-value">±2 ppm</div></div>
+          <div class="spec-chip"><div class="spec-label">RTC batería</div><div class="spec-value">CR2032 (años)</div></div>
+        </div>
+        <div class="ven-lim-grid">
+          <div class="ven-box"><div class="vl-title">✅ Ventajas</div><ul class="vl-list">
+            <li>Guarda datos permanentemente aunque se apague</li>
+            <li>Archivos legibles en cualquier computadora</li>
+            <li>El RTC mantiene la hora sin energía externa</li>
+            <li>Ideal para proyectos de monitoreo ambiental</li>
+          </ul></div>
+          <div class="lim-box"><div class="vl-title">⚠️ Limitaciones</div><ul class="vl-list">
+            <li>Las tarjetas SD tienen ciclos de escritura limitados</li>
+            <li>El módulo SD usa pines SPI que comparte con otros</li>
+            <li>Fragmentación si se escribe y borra frecuentemente</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ======= 10: PROTECCIÓN ======= -->
+  <section class="guide-section sec-anchor" id="mod10">
+    <div class="sec-head">
+      <div class="sec-num n-dark">10</div>
+      <div class="sec-titles">
+        <div class="sec-title">Componentes de Protección</div>
+        <div class="sec-sub">Resistencias, diodos, capacitores y fusibles para proteger el circuito</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>En cualquier proyecto con Arduino, los <strong>componentes de protección</strong> son tan importantes como los funcionales. Sin ellos, un pico de voltaje, una polaridad invertida o una sobrecorriente pueden destruir permanentemente el microcontrolador o los componentes conectados. Cada componente tiene un rol específico en el circuito.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Componente</th><th>Función</th><th>Valores comunes</th><th>Uso en Arduino</th></tr></thead>
+        <tbody>
+          <tr><td>Resistencia (Ω)</td><td>Limita corriente, divide voltaje, hace pull-up/down</td><td>220Ω, 1kΩ, 10kΩ</td><td><span class="tbadge tb-yes">Esencial</span></td></tr>
+          <tr><td>Diodo 1N4007</td><td>Permite corriente en un solo sentido, protege de inversión</td><td>1A / 1000V</td><td><span class="tbadge tb-yes">Recomendado</span></td></tr>
+          <tr><td>Diodo Zener</td><td>Regula voltaje, clamp de protección</td><td>3.3V, 5.1V, 12V</td><td><span class="tbadge tb-mid">Avanzado</span></td></tr>
+          <tr><td>Capacitor electrolítico</td><td>Filtra ruido en la alimentación, estabiliza voltaje</td><td>10µF, 100µF, 470µF</td><td><span class="tbadge tb-yes">Recomendado</span></td></tr>
+          <tr><td>Capacitor cerámico</td><td>Filtra ruido de alta frecuencia</td><td>100nF, 1µF</td><td><span class="tbadge tb-yes">Recomendado</span></td></tr>
+          <tr><td>Transistor NPN (2N2222)</td><td>Amplifica corriente, switch electrónico para cargas</td><td>600 mA / 40V</td><td><span class="tbadge tb-yes">Común</span></td></tr>
+          <tr><td>MOSFET (IRF540)</td><td>Switch de alta corriente para motores y LEDs de potencia</td><td>Hasta 28A / 100V</td><td><span class="tbadge tb-mid">Avanzado</span></td></tr>
+          <tr><td>Fusible rearmable (PTC)</td><td>Protege contra sobrecorriente, se recupera solo</td><td>100mA – 3A</td><td><span class="tbadge tb-yes">Recomendado</span></td></tr>
+          <tr><td>Optoacoplador (4N25)</td><td>Aísla eléctricamente dos circuitos (como relé con lógica)</td><td>–</td><td><span class="tbadge tb-mid">Avanzado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box ib-tip">
+      <span class="info-box-icon">💡</span>
+      <div class="info-box-text"><strong>Regla de oro:</strong> Siempre coloca una resistencia en serie con un LED conectado a Arduino. Calcula el valor con: <code>R = (Vcc - Vled) / Iled</code>. Para un LED rojo con Vled=2V, Iled=20mA en 5V: <code>R = (5-2)/0.02 = 150Ω</code>. Usa 220Ω como valor seguro universal para LEDs de 5V.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONCLUSIÓN -->
+  <div class="conclusion">
+    <h3>🎓 ¿Qué aprendiste?</h3>
+    <p>Recorriste los <strong>10 componentes y sistemas fundamentales de Arduino</strong>: desde entender qué es la plataforma y su filosofía open-source, hasta el corazón del sistema (ATmega328P), los pines de I/O digitales y analógicos, la alimentación, sensores de temperatura, distancia y movimiento, actuadores como servos y relés, módulos de comunicación Bluetooth y Wi-Fi, pantallas LCD, almacenamiento en SD y los componentes de protección que mantienen todo funcionando.</p>
+    <p>Arduino no es solo un microcontrolador: es una <strong>plataforma de aprendizaje y creación</strong>. Con estos componentes como bloques de construcción, puedes crear desde un termómetro digital hasta un robot autónomo. El límite lo pone únicamente tu imaginación. 🦦⚡</p>
+  </div>
+
+</main>
+
+<footer class="task-footer">
+  <p>🦦 <span>Tarea 07</span> · Componentes de Arduino · Cultura Digital II</p>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+</script>
+</body>
+</html>
